@@ -1,6 +1,7 @@
 # Loading the entire dataset
 library(eechidna)
 library(tidyverse)
+library(gridExtra)
 
 data(tpp01)
 data(tpp04)
@@ -15,29 +16,19 @@ data(abs2010)
 data(abs2013)
 data(abs2016)
 
-# Make more general age baskets: 0-24, 25-54, 55-onwards
-basket_age <- function(abs_df) {
-  abs_df <- abs_df %>% 
-    mutate(Age00_24 = Age00_04 + Age05_14 + Age15_19 + Age20_24, 
-      Age25_54 = Age25_34 + Age35_44 + Age45_54,
-      Age55plus = Age55_64 + Age65_74 + Age75_84 + Age85plus) %>% 
-    select(-c(Age00_04, Age05_14, Age15_19, Age20_24, Age25_34, 
-      Age35_44, Age45_54, Age55_64, Age65_74, Age75_84, Age85plus))
-  return(abs_df)
-}
 
-abs2001 <- abs2001 %>% 
-  basket_age()
+abs2001 <- abs2001 %>%
+  select(-starts_with("Age"))
 abs2004 <- abs2004 %>% 
-  basket_age()
+    select(-starts_with("Age"))
 abs2007 <- abs2007 %>% 
-  basket_age()
+    select(-starts_with("Age"))
 abs2010 <- abs2010 %>% 
-  basket_age()
+    select(-starts_with("Age"))
 abs2013 <- abs2013 %>% 
-  basket_age()
+    select(-starts_with("Age"))
 abs2016 <- abs2016 %>% 
-  basket_age()
+    select(-starts_with("Age"))
 
 # Combine and standardize
 my_df <- bind_rows(
@@ -52,6 +43,9 @@ my_df <- bind_rows(
   mutate(year = factor(year)) %>% 
   select(-c(DivisionNm, StateAb, LNP_Votes, ALP_Votes, ALP_Percent, TotalVotes,
     Swing, InternetUse, InternetAccess, EnglishOnly, Other_NonChrist, OtherChrist, Volunteer, EmuneratedElsewhere))
+
+# Looking at correlations > 0.5
+# temp <- my_df %>% select(-c(year, LNP_Percent)) %>% cor() %>% data.frame() %>% rownames_to_column(var = "var1") %>% gather(key = "var2", value = "corr", -var1) %>% filter(abs(corr) > 0.5, corr != 1)
 
 # ------------------------------------------------------------------------------------
 
@@ -115,7 +109,6 @@ plot_pc4 <- pca_loadings %>%
   theme(axis.text.x = element_text(angle = 60, size = 6, hjust = 1)) +
   labs(x = "Variable") + ggtitle("PC4") + guides(col = F)
 
-library(gridExtra)
 grid.arrange(plot_pc1, plot_pc2, plot_pc3, plot_pc4, nrow = 2)
 
 # Do PCA on all
@@ -159,10 +152,17 @@ grid.arrange(plot_pc_all1, plot_pc_all2, plot_pc_all3, plot_pc_all4, nrow = 2)
 
 small_df <- my_df %>% 
   mutate(Education = BachelorAbv + HighSchool + Professional + Finance - Laborer - Tradesperson - DipCert,
-    FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House - SP_House + Age00_04,
+    FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House - SP_House,
     PropertyOwned = Owned + Mortgage - Renting - PublicHousing,
-    Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome) %>% 
-  select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, DipCert, FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Age00_04, Owned, Mortgage, Renting, PublicHousing, MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome))
+    RentLoanPrice = MedianRent + MedianLoanPay,
+    Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome,
+    Unemployment = Unemployed - LFParticipation) %>% 
+  select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, DipCert, FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Mortgage, Renting, PublicHousing, MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, MedianLoanPay, Unemployed, LFParticipation))
+
+
+# ------------------------------------------------------------------------------------
+
+# Testing proc time
 
 # All 3 variable linear models
 a <- proc.time()
@@ -174,9 +174,20 @@ b-a
 
 # All 3 variable spatial error models
 library(rgeos)
-sF_16 <- sF_download(2016)
-sp_weights_16 <- sp_weights_matrix(sF_16)
 library(spdep)
+sF_16 <- sF_download(2016)
+sF_13 <- sF_download(2013)
+sF_10 <- sF_download(2010)
+sF_07 <- sF_download(2007)
+sF_04 <- sF_download(2004)
+sF_01 <- sF_download(2001)
+sp_weights_16 <- sp_weights_matrix(sF_16)
+sp_weights_13 <- sp_weights_matrix(sF_13)
+sp_weights_10 <- sp_weights_matrix(sF_10)
+sp_weights_07 <- sp_weights_matrix(sF_07)
+sp_weights_04 <- sp_weights_matrix(sF_04)
+sp_weights_01 <- sp_weights_matrix(sF_01)
+
 
 c <- proc.time()
 test <- all_sperr_X_way(
@@ -186,28 +197,52 @@ test <- all_sperr_X_way(
   sp_weights = sp_weights_16)
 d <- proc.time()
 d-c
-# Problem - all possible 5 variable spatial error models will take too long
+# Problem - all possible 5 variable spatial error models will take too long (~100 hours)
 
-# All 5 variable spatial models
-library(rgeos)
-sF_16 <- sF_download(2016)
-sp_weights_16 <- sp_weights_matrix(sF_16)
+# ------------------------------------------------------------------------------------
 
-library(spdep)
-testmod <- errorsarlm(LNP_Percent ~ ., data=(small_df %>% filter(year == "2016") %>% select(-year)), sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999))
+# Basic models
+
+# Spatial model
+sp_model16 <- errorsarlm(LNP_Percent ~ ., data=(small_df %>% filter(year == "2016") %>% select(-year)), sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999))
 
 # Regression
-naive_model <- lm(LNP_Percent ~ ., my_df %>% filter(year == "2016") %>% select(-c(year, starts_with("Age"))))
-visreg(naive_model)
+lin_model16 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2016") %>% select(-year))
+lin_model13 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2013") %>% select(-year))
+lin_model10 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2010") %>% select(-year))
+lin_model07 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2007") %>% select(-year))
+lin_model04 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2004") %>% select(-year))
+lin_model01 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2001") %>% select(-year))
+
+
+# Test for spatial correlation in residuals
+moran.test(residuals(lin_model16), sp_weights_16)
+moran.test(residuals(lin_model13), sp_weights_13)
+moran.test(residuals(lin_model10), sp_weights_10)
+moran.test(residuals(lin_model07), sp_weights_07)
+moran.test(residuals(lin_model04), sp_weights_04)
+moran.test(residuals(lin_model01), sp_weights_01)
+
+# See which electorates differ the most from their neighbours (in terms of residuals)
+moran.plot(residuals(lin_model16), sp_weights_16)
+moran.plot(residuals(lin_model13), sp_weights_13)
+moran.plot(residuals(lin_model10), sp_weights_10)
+moran.plot(residuals(lin_model07), sp_weights_07)
+moran.plot(residuals(lin_model04), sp_weights_04)
+moran.plot(residuals(lin_model01), sp_weights_01)
+
+# Plot the residuals a
+
+# ------------------------------------------------------------------------------------
+
+# Alternative method of variable selection
 
 # LASSO
 lambda <- 10^seq(10, -2, length = 100)
 library(glmnet)
-x <- my_df %>% filter(year == "2016") %>% select(-c(year, starts_with("Age"), LNP_Percent)) %>% as.matrix
-y <- my_df %>% filter(year == "2016") %>% select(LNP_Percent) %>% as.matrix
-
+x <- small_df %>% filter(year == "2016") %>% select(-c(year, LNP_Percent)) %>% as.matrix
+y <- small_df %>% filter(year == "2016") %>% select(LNP_Percent) %>% as.matrix
 lasso.mod <- glmnet(x, y, alpha = 1, lambda = lambda)
 cv.out <- cv.glmnet(x, y, alpha = 1)
 bestlam <- cv.out$lambda.min
-  
 predict(lasso.mod, type = "coefficients", s = bestlam)

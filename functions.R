@@ -252,3 +252,17 @@ all_sperr_X_way <- function(y_vec, x_df, sp_weights, n_vars) {
   return(Xway_models)
   
 }
+
+# ---------------------------------------------------------------------------------
+
+# Make more general age baskets: 0-24, 25-54, 55-onwards
+basket_age <- function(abs_df) {
+  abs_df <- abs_df %>% 
+    mutate(Age00_19 = Age00_04 + Age05_14 + Age15_19, 
+      Age20_34 = Age20_24 + Age25_34,
+      Age35_54 = Age35_44 + Age45_54, 
+      Age55plus = Age55_64 + Age65_74 + Age75_84 + Age85plus) %>% 
+    select(-c(Age00_04, Age05_14, Age15_19, Age20_24, Age25_34, 
+      Age35_44, Age45_54, Age55_64, Age65_74, Age75_84, Age85plus, MedianAge))
+  return(abs_df)
+}
