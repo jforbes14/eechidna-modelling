@@ -66,7 +66,7 @@ all_X_way <- function(y_vec, x_df, n_vars) {
     #e <- index[,i][5]
     
     # Fit regression
-    fit <- lm(y_vec ~ ., mat_data[,c(index[,i],ncol(mat_data))])
+    fit <- lm(y_vec ~ ., mat_data[, index[,i]])
     
     # Model statistics
     sumr = summary(fit)
@@ -87,12 +87,14 @@ all_X_way <- function(y_vec, x_df, n_vars) {
     
     Xway_models$vars[i] = list(index[,i])
     
+    #Xway_models$varnames[i] = list(names(x_df)[index[,i]])
+    
     Xway_models$coef[i] = list(fit$coefficients[-1] %>% unname)
     
     Xway_models$t[i] = list(sumr$coefficients[-1,"t value"] %>% unname)
     
     
-    if (i %% 10000 == 0) {
+    if (i %% 5000 == 0) {
       print(paste("rep",i))
     }
     
@@ -101,6 +103,58 @@ all_X_way <- function(y_vec, x_df, n_vars) {
   return(Xway_models)
   
 }
+
+# ---------------------------------------------------------------------------------
+
+# Compute variable importance function using Akaike Weights
+
+var_imp <- function(Xway, x_df) {
+  
+  # Best global AIC
+  best_AIC <- min(Xway$AIC)
+  
+  # Akaike weights
+  w_vars <- Xway %>% 
+    mutate(delta = AIC - best_AIC,
+      w_numer = exp(-delta/2),
+      w_denom = sum(w_numer),
+      w = w_numer/w_denom) %>% 
+    dplyr::select(vars, w)
+  
+  # Inferring number of columns in X
+  n_col_x = Xway %>% filter(iter %in% 1:100) %>% dplyr::select(vars) %>% unlist %>% max
+  
+  # Empty variable importance df
+  var_imp <- data.frame(var = 1:n_col_x, sum_w = 0, coef_wsum = 0)
+  
+  for (i in 1:nrow(w_vars)) {
+    # Variables
+    vars <- w_vars$vars[i] %>% unlist %>% unname
+    
+    # Add weight to sum of weights
+    w <- w_vars$w[i]
+    var_imp[vars, "sum_w"] <- var_imp[vars, "sum_w"] + w
+    
+    # Add running tally of weighted coefficient
+    var_imp[vars, "coef_wsum"] <- var_imp[vars, "coef_wsum"] + w*(Xway[i, ]$coef %>% unlist)
+  }
+  
+  # Compute weighted model average of coeffficient
+  var_imp <- var_imp %>% 
+    mutate(coef_wavg = (coef_wsum / sum_w))
+  
+  # Attach variable names
+  names <- data.frame(var = 1:ncol(x_df), varname = names(x_df))
+  
+  var_imp <- var_imp %>% 
+    left_join(names, by = "var")
+  
+  return(var_imp)
+}
+
+
+
+
 
 # ---------------------------------------------------------------------------------
 
