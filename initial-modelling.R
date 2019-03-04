@@ -15,10 +15,10 @@ load("data/small_df.rda")
 # Basic models - without any variable selection
 
 # Spatial model
-sp_model16 <- errorsarlm(LNP_Percent ~ ., data=(small_df %>% filter(year == "2016") %>% select(-year)), sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999))
+sp_model16 <- errorsarlm(LNP_Percent ~ ., data=(small_df %>% filter(year == "2016") %>% select(-c(DivisionNm, year))), sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999))
 
 # Regression
-lin_model16 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2016") %>% select(-year))
+lin_model16 <- lm(LNP_Percent ~ ., small_df %>% filter(year == "2016") %>% select(-c(DivisionNm, year)))
 
 # Test for spatial correlation in residuals
 moran.test(residuals(lin_model16), sp_weights_16)
@@ -33,7 +33,7 @@ moran.plot(residuals(lin_model16), sp_weights_16)
 # 2016
 fiveway16 <- all_X_way(
   y_vec = small_df %>% filter(year == "2016") %>% select(LNP_Percent) %>% as.matrix(),
-  x_df = small_df %>% filter(year == "2016") %>% select(-c(LNP_Percent, year)),
+  x_df = small_df %>% filter(year == "2016") %>% select(-c(DivisionNm, LNP_Percent, year)),
   n_vars = 5
 )
 
@@ -42,7 +42,7 @@ save(fiveway16, file = "data/fiveway16.rda")
 # 2013
 fiveway13 <- all_X_way(
   y_vec = small_df %>% filter(year == "2013") %>% select(LNP_Percent) %>% as.matrix(),
-  x_df = small_df %>% filter(year == "2013") %>% select(-c(LNP_Percent, year)),
+  x_df = small_df %>% filter(year == "2013") %>% select(-c(DivisionNm, LNP_Percent, year)),
   n_vars = 5
 )
 
@@ -51,7 +51,7 @@ save(fiveway13, file = "data/fiveway13.rda")
 # 2010
 fiveway10 <- all_X_way(
   y_vec = small_df %>% filter(year == "2010") %>% select(LNP_Percent) %>% as.matrix(),
-  x_df = small_df %>% filter(year == "2010") %>% select(-c(LNP_Percent, year)),
+  x_df = small_df %>% filter(year == "2010") %>% select(-c(DivisionNm, LNP_Percent, year)),
   n_vars = 5
 )
 
@@ -60,7 +60,7 @@ save(fiveway10, file = "data/fiveway10.rda")
 # 2007
 fiveway07 <- all_X_way(
   y_vec = small_df %>% filter(year == "2007") %>% select(LNP_Percent) %>% as.matrix(),
-  x_df = small_df %>% filter(year == "2007") %>% select(-c(LNP_Percent, year)),
+  x_df = small_df %>% filter(year == "2007") %>% select(-c(DivisionNm, LNP_Percent, year)),
   n_vars = 5
 )
 
@@ -69,7 +69,7 @@ save(fiveway07, file = "data/fiveway07.rda")
 # 2004
 fiveway04 <- all_X_way(
   y_vec = small_df %>% filter(year == "2004") %>% select(LNP_Percent) %>% as.matrix(),
-  x_df = small_df %>% filter(year == "2004") %>% select(-c(LNP_Percent, year)),
+  x_df = small_df %>% filter(year == "2004") %>% select(-c(DivisionNm, LNP_Percent, year)),
   n_vars = 5
 )
 
@@ -78,7 +78,7 @@ save(fiveway04, file = "data/fiveway04.rda")
 # 2001
 fiveway01 <- all_X_way(
   y_vec = small_df %>% filter(year == "2001") %>% select(LNP_Percent) %>% as.matrix(),
-  x_df = small_df %>% filter(year == "2001") %>% select(-c(LNP_Percent, year)),
+  x_df = small_df %>% filter(year == "2001") %>% select(-c(DivisionNm, LNP_Percent, year)),
   n_vars = 5
 )
 
@@ -133,6 +133,39 @@ superset_vars <- superset_n(5) %>%
   dplyr::select(varname) %>% 
   mutate(varname = as.character(varname)) %>% 
   unlist() %>% unname()
+
+# ------------------------------------------------------------------------------------
+
+# Test for spatial autocorrelation in the response
+
+moran.test(small_df %>% filter(year == "2016") %>% select(LNP_Percent) %>% unlist, sp_weights_16)
+moran.test(small_df %>% filter(year == "2013") %>% select(LNP_Percent) %>% unlist, sp_weights_13)
+moran.test(small_df %>% filter(year == "2010") %>% select(LNP_Percent) %>% unlist, sp_weights_10)
+moran.test(small_df %>% filter(year == "2007") %>% select(LNP_Percent) %>% unlist, sp_weights_07)
+moran.test(small_df %>% filter(year == "2004") %>% select(LNP_Percent) %>% unlist, sp_weights_04)
+moran.test(small_df %>% filter(year == "2001") %>% select(LNP_Percent) %>% unlist, sp_weights_01)
+
+# Test for spatial autocorrelation in residuals of linear model without interactions
+
+mod16_lm <- lm(LNP_Percent ~ ., 
+  data = small_df %>% filter(year == "2016") %>% select(c(LNP_Percent, superset_vars)))
+mod13_lm <- lm(LNP_Percent ~ ., 
+  data = small_df %>% filter(year == "2013") %>% select(c(LNP_Percent, superset_vars)))
+mod10_lm <- lm(LNP_Percent ~ ., 
+  data = small_df %>% filter(year == "2010") %>% select(c(LNP_Percent, superset_vars)))
+mod07_lm <- lm(LNP_Percent ~ ., 
+  data = small_df %>% filter(year == "2007") %>% select(c(LNP_Percent, superset_vars)))
+mod04_lm <- lm(LNP_Percent ~ ., 
+  data = small_df %>% filter(year == "2004") %>% select(c(LNP_Percent, superset_vars)))
+mod01_lm <- lm(LNP_Percent ~ ., 
+  data = small_df %>% filter(year == "2001") %>% select(c(LNP_Percent, superset_vars)))
+
+moran.test(mod16_lm$residuals, sp_weights_16)
+moran.test(mod13_lm$residuals, sp_weights_13)
+moran.test(mod10_lm$residuals, sp_weights_10)
+moran.test(mod07_lm$residuals, sp_weights_07)
+moran.test(mod04_lm$residuals, sp_weights_04)
+moran.test(mod01_lm$residuals, sp_weights_01)
 
 # ------------------------------------------------------------------------------------
 
@@ -462,3 +495,14 @@ moran.test(mod01$residuals, sp_weights_01)
 # No evidence of spatial correlation in the residuals
 
 moran.plot(mod16$residuals, sp_weights_16)
+
+# ------------------------------------------------------------------------------------
+
+# Misspecified model - spatial autocorrelation in residuals?
+random_vars <- c("Born_SE_Europe", "ManagerAdminClericalSales", "Extractive", "RentLoanPrice", "OneParent_House", "MedianAge", "NoReligion", "Education", "Born_UK", "CurrentlyStudying")
+
+mis_mod16 <- errorsarlm(LNP_Percent ~ . + MedianAge:Education + Extractive:ManagerAdminClericalSales + OneParent_House:Education + ManagerAdminClericalSales:Education, 
+  data=(small_df %>% filter(year == "2016") %>% dplyr::select(c(LNP_Percent, random_vars))),
+  sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999))
+
+moran.test(mis_mod16$residuals, sp_weights_16)
