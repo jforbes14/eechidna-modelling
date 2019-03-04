@@ -404,37 +404,37 @@ bind_rows(int01_3, int04_3, int07_3, int10_3, int13_3, int16_3) %>%
 # Fourth
 
 int16_4 <- interact_F(
-  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe, 
     data=(small_df %>% filter(year == "2016") %>% dplyr::select(c(LNP_Percent, superset_vars))),
     sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999)),
   sp_weights_16
 )
 int13_4 <- interact_F(
-  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe, 
     data=(small_df %>% filter(year == "2013") %>% dplyr::select(c(LNP_Percent, superset_vars))),
     sp_weights_13, etype="error", method="eigen", interval=c(-1,0.999)),
   sp_weights_13
 )
 int10_4 <- interact_F(
-  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe, 
     data=(small_df %>% filter(year == "2010") %>% dplyr::select(c(LNP_Percent, superset_vars))),
     sp_weights_10, etype="error", method="eigen", interval=c(-1,0.999)),
   sp_weights_10
 )
 int07_4 <- interact_F(
-  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe, 
     data=(small_df %>% filter(year == "2007") %>% dplyr::select(c(LNP_Percent, superset_vars))),
     sp_weights_07, etype="error", method="eigen", interval=c(-1,0.999)),
   sp_weights_07
 )
 int04_4 <- interact_F(
-  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe, 
     data=(small_df %>% filter(year == "2004") %>% dplyr::select(c(LNP_Percent, superset_vars))),
     sp_weights_04, etype="error", method="eigen", interval=c(-1,0.999)),
   sp_weights_04
 )
 int01_4 <- interact_F(
-  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe, 
     data=(small_df %>% filter(year == "2001") %>% dplyr::select(c(LNP_Percent, superset_vars))),
     sp_weights_01, etype="error", method="eigen", interval=c(-1,0.999)),
   sp_weights_01
@@ -448,33 +448,80 @@ bind_rows(int01_4, int04_4, int07_4, int10_4, int13_4, int16_4) %>%
   top_n(n = 1, wt = n) %>% 
   filter(minp == min(minp))
 
+# Fifth
+
+int16_5 <- interact_F(
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
+    data=(small_df %>% filter(year == "2016") %>% dplyr::select(c(LNP_Percent, superset_vars))),
+    sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999)),
+  sp_weights_16
+)
+int13_5 <- interact_F(
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
+    data=(small_df %>% filter(year == "2013") %>% dplyr::select(c(LNP_Percent, superset_vars))),
+    sp_weights_13, etype="error", method="eigen", interval=c(-1,0.999)),
+  sp_weights_13
+)
+int10_5 <- interact_F(
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
+    data=(small_df %>% filter(year == "2010") %>% dplyr::select(c(LNP_Percent, superset_vars))),
+    sp_weights_10, etype="error", method="eigen", interval=c(-1,0.999)),
+  sp_weights_10
+)
+int07_5 <- interact_F(
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
+    data=(small_df %>% filter(year == "2007") %>% dplyr::select(c(LNP_Percent, superset_vars))),
+    sp_weights_07, etype="error", method="eigen", interval=c(-1,0.999)),
+  sp_weights_07
+)
+int04_5 <- interact_F(
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
+    data=(small_df %>% filter(year == "2004") %>% dplyr::select(c(LNP_Percent, superset_vars))),
+    sp_weights_04, etype="error", method="eigen", interval=c(-1,0.999)),
+  sp_weights_04
+)
+int01_5 <- interact_F(
+  errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
+    data=(small_df %>% filter(year == "2001") %>% dplyr::select(c(LNP_Percent, superset_vars))),
+    sp_weights_01, etype="error", method="eigen", interval=c(-1,0.999)),
+  sp_weights_01
+)
+
+bind_rows(int01_5, int04_5, int07_5, int10_5, int13_5, int16_5) %>% 
+  filter(pvalue < 0.01) %>% 
+  group_by(interact_var1, interact_var2) %>% 
+  summarise(n = n(), minp = min(pvalue)) %>%
+  ungroup() %>% 
+  top_n(n = 1, wt = n) %>% 
+  filter(minp == min(minp))
+
 # No more interactions are significant at 1% level
 
 # ------------------------------------------------------------------------------------
 
 # Final models
 
-mod16 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+mod16 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
   data=(small_df %>% filter(year == "2016") %>% dplyr::select(c(LNP_Percent, superset_vars))),
   sp_weights_16, etype="error", method="eigen", interval=c(-1,0.999))
 
-mod13 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+mod13 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
   data=(small_df %>% filter(year == "2013") %>% dplyr::select(c(LNP_Percent, superset_vars))),
   sp_weights_13, etype="error", method="eigen", interval=c(-1,0.999))
 
-mod10 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+mod10 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
   data=(small_df %>% filter(year == "2010") %>% dplyr::select(c(LNP_Percent, superset_vars))),
   sp_weights_10, etype="error", method="eigen", interval=c(-1,0.999))
 
-mod07 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+mod07 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
   data=(small_df %>% filter(year == "2007") %>% dplyr::select(c(LNP_Percent, superset_vars))),
   sp_weights_07, etype="error", method="eigen", interval=c(-1,0.999))
 
-mod04 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+mod04 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
   data=(small_df %>% filter(year == "2004") %>% dplyr::select(c(LNP_Percent, superset_vars))),
   sp_weights_04, etype="error", method="eigen", interval=c(-1,0.999))
 
-mod01 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:DiffAddress, 
+mod01 <- errorsarlm(LNP_Percent ~ . + OtherLanguageHome:Extractive + OtherLanguageHome:DeFacto + ManagerAdminClericalSales:Extractive + OtherLanguageHome:Born_SE_Europe + Unemployment:Extractive, 
   data=(small_df %>% filter(year == "2001") %>% dplyr::select(c(LNP_Percent, superset_vars))),
   sp_weights_01, etype="error", method="eigen", interval=c(-1,0.999))
 
