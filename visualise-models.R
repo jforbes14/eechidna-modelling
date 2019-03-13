@@ -170,8 +170,9 @@ interaction_plot <- function(my_model, varnames, year = "Enter Year", xlimits = 
   }
   
   # Get min and max of each variable in interaction
-  my_min <- floor(min(min(df[, varnames[1]]), min(df[, varnames[2]])))
-  my_max <- ceiling(max(max(df[, varnames[1]]), max(df[, varnames[2]])))
+  # Add a 20% buffer on the outside
+  my_min <- floor(min(min(df[, varnames[1]]), min(df[, varnames[2]])))*1.5
+  my_max <- ceiling(max(max(df[, varnames[1]]), max(df[, varnames[2]])))*1.5
   
   # Range of min max
   my_range = my_max - my_min
@@ -232,23 +233,23 @@ TPP_scale <- rasterGrob(readPNG("figures/TPP_scale.png"))
 
 # Extractive:OtherLanguageHome
 Extract_Other_16 <- interaction_plot(mod16, c("Extractive", "OtherLanguageHome"), 2016,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 Extract_Other_13 <- interaction_plot(mod13, c("Extractive", "OtherLanguageHome"), 2013,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 Extract_Other_10 <- interaction_plot(mod10, c("Extractive", "OtherLanguageHome"), 2010,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 Extract_Other_07 <- interaction_plot(mod07, c("Extractive", "OtherLanguageHome"), 2007,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 Extract_Other_04 <- interaction_plot(mod04, c("Extractive", "OtherLanguageHome"), 2004,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 Extract_Other_01 <- interaction_plot(mod01, c("Extractive", "OtherLanguageHome"), 2001,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 
 grid.arrange(Extract_Other_01, Extract_Other_04, Extract_Other_07, Extract_Other_10, Extract_Other_13, Extract_Other_16, TPP_scale,
   nrow = 3, 
@@ -262,23 +263,23 @@ grid.arrange(Extract_Other_01, Extract_Other_04, Extract_Other_07, Extract_Other
 
 # DeFacto:OtherLanguageHome
 DeFacto_Other_16 <- interaction_plot(mod16, c("DeFacto", "OtherLanguageHome"), 2016,
-  xlimits = c(min(small_df$DeFacto) - 0.25, max(small_df$DeFacto) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$DeFacto) - 0.15, max(small_df$DeFacto) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 DeFacto_Other_13 <- interaction_plot(mod13, c("DeFacto", "OtherLanguageHome"), 2013,
-  xlimits = c(min(small_df$DeFacto) - 0.25, max(small_df$DeFacto) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$DeFacto) - 0.15, max(small_df$DeFacto) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 DeFacto_Other_10 <- interaction_plot(mod10, c("DeFacto", "OtherLanguageHome"), 2010,
-  xlimits = c(min(small_df$DeFacto) - 0.25, max(small_df$DeFacto) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$DeFacto) - 0.15, max(small_df$DeFacto) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 DeFacto_Other_07 <- interaction_plot(mod07, c("DeFacto", "OtherLanguageHome"), 2007,
-  xlimits = c(min(small_df$DeFacto) - 0.25, max(small_df$DeFacto) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$DeFacto) - 0.15, max(small_df$DeFacto) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 DeFacto_Other_04 <- interaction_plot(mod04, c("DeFacto", "OtherLanguageHome"), 2004,
-  xlimits = c(min(small_df$DeFacto) - 0.25, max(small_df$DeFacto) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$DeFacto) - 0.15, max(small_df$DeFacto) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 DeFacto_Other_01 <- interaction_plot(mod01, c("DeFacto", "OtherLanguageHome"), 2001,
-  xlimits = c(min(small_df$DeFacto) - 0.25, max(small_df$DeFacto) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$DeFacto) - 0.15, max(small_df$DeFacto) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 
 grid.arrange(DeFacto_Other_01, DeFacto_Other_04, DeFacto_Other_07, DeFacto_Other_10, DeFacto_Other_13, DeFacto_Other_16, TPP_scale,
   nrow = 3, 
@@ -292,23 +293,23 @@ grid.arrange(DeFacto_Other_01, DeFacto_Other_04, DeFacto_Other_07, DeFacto_Other
 
 # Extractive:ManagerAdminClericalSales
 Extract_Admin_16 <- interaction_plot(mod16, c("Extractive", "ManagerAdminClericalSales"), 2016,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.25, max(small_df$ManagerAdminClericalSales) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.15, max(small_df$ManagerAdminClericalSales) + 0.15))
 Extract_Admin_13 <- interaction_plot(mod13, c("Extractive", "ManagerAdminClericalSales"), 2013,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.25, max(small_df$ManagerAdminClericalSales) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.15, max(small_df$ManagerAdminClericalSales) + 0.15))
 Extract_Admin_10 <- interaction_plot(mod10, c("Extractive", "ManagerAdminClericalSales"), 2010,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.25, max(small_df$ManagerAdminClericalSales) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.15, max(small_df$ManagerAdminClericalSales) + 0.15))
 Extract_Admin_07 <- interaction_plot(mod07, c("Extractive", "ManagerAdminClericalSales"), 2007,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.25, max(small_df$ManagerAdminClericalSales) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.15, max(small_df$ManagerAdminClericalSales) + 0.15))
 Extract_Admin_04 <- interaction_plot(mod04, c("Extractive", "ManagerAdminClericalSales"), 2004,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.25, max(small_df$ManagerAdminClericalSales) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.15, max(small_df$ManagerAdminClericalSales) + 0.15))
 Extract_Admin_01 <- interaction_plot(mod01, c("Extractive", "ManagerAdminClericalSales"), 2001,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.25, max(small_df$ManagerAdminClericalSales) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$ManagerAdminClericalSales) - 0.15, max(small_df$ManagerAdminClericalSales) + 0.15))
 
 grid.arrange(Extract_Admin_01, Extract_Admin_04, Extract_Admin_07, Extract_Admin_10, Extract_Admin_13, Extract_Admin_16, TPP_scale,
   nrow = 3, 
@@ -322,23 +323,23 @@ grid.arrange(Extract_Admin_01, Extract_Admin_04, Extract_Admin_07, Extract_Admin
 
 # Born_SE_Europe:OtherLanguageHome
 BornSE_Other_16 <- interaction_plot(mod16, c("Born_SE_Europe", "OtherLanguageHome"), 2016,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.25, max(small_df$Born_SE_Europe) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 BornSE_Other_13 <- interaction_plot(mod13, c("Born_SE_Europe", "OtherLanguageHome"), 2013,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.25, max(small_df$Born_SE_Europe) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 BornSE_Other_10 <- interaction_plot(mod10, c("Born_SE_Europe", "OtherLanguageHome"), 2010,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.25, max(small_df$Born_SE_Europe) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 BornSE_Other_07 <- interaction_plot(mod07, c("Born_SE_Europe", "OtherLanguageHome"), 2007,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.25, max(small_df$Born_SE_Europe) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 BornSE_Other_04 <- interaction_plot(mod04, c("Born_SE_Europe", "OtherLanguageHome"), 2004,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.25, max(small_df$Born_SE_Europe) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 BornSE_Other_01 <- interaction_plot(mod01, c("Born_SE_Europe", "OtherLanguageHome"), 2001,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.25, max(small_df$Born_SE_Europe) + 0.25), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.25, max(small_df$OtherLanguageHome) + 0.25))
+  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
+  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
 
 grid.arrange(BornSE_Other_01, BornSE_Other_04, BornSE_Other_07, BornSE_Other_10, BornSE_Other_13, BornSE_Other_16, TPP_scale,
   nrow = 3, 
@@ -352,23 +353,23 @@ grid.arrange(BornSE_Other_01, BornSE_Other_04, BornSE_Other_07, BornSE_Other_10,
 
 # Extractive:Unemployed
 Extract_Admin_16 <- interaction_plot(mod16, c("Extractive", "Unemployed"), 2016,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$Unemployed) - 0.25, max(small_df$Unemployed) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
 Extract_Admin_13 <- interaction_plot(mod13, c("Extractive", "Unemployed"), 2013,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$Unemployed) - 0.25, max(small_df$Unemployed) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
 Extract_Admin_10 <- interaction_plot(mod10, c("Extractive", "Unemployed"), 2010,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$Unemployed) - 0.25, max(small_df$Unemployed) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
 Extract_Admin_07 <- interaction_plot(mod07, c("Extractive", "Unemployed"), 2007,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$Unemployed) - 0.25, max(small_df$Unemployed) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
 Extract_Admin_04 <- interaction_plot(mod04, c("Extractive", "Unemployed"), 2004,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$Unemployed) - 0.25, max(small_df$Unemployed) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
 Extract_Admin_01 <- interaction_plot(mod01, c("Extractive", "Unemployed"), 2001,
-  xlimits = c(min(small_df$Extractive) - 0.25, max(small_df$Extractive) + 0.25), 
-  ylimits = c(min(small_df$Unemployed) - 0.25, max(small_df$Unemployed) + 0.25))
+  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
+  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
 
 grid.arrange(Extract_Admin_01, Extract_Admin_04, Extract_Admin_07, Extract_Admin_10, Extract_Admin_13, Extract_Admin_16, TPP_scale,
   nrow = 3, 
