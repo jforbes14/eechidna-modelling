@@ -19,17 +19,16 @@ data(abs2016)
 
 # Combine and standardize
 my_df <- bind_rows(
-  left_join(tpp01, standardise_vars(abs2001) %>% select(-c(ID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2001"),
-  left_join(tpp04, standardise_vars(abs2004), by = c("DivisionNm")) %>% mutate(year = "2004"),
-  left_join(tpp07, standardise_vars(abs2007), by = c("DivisionNm")) %>% mutate(year = "2007"),
-  left_join(tpp10, standardise_vars(abs2010), by = c("DivisionNm")) %>% mutate(year = "2010"),
-  left_join(tpp13, standardise_vars(abs2013), by = c("DivisionNm")) %>% mutate(year = "2013"),
-  left_join(tpp16, standardise_vars(abs2016) %>% select(-c(ID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2016")
+  left_join(tpp01, standardise_vars(abs2001) %>% select(-c(UniqueID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2001"),
+  left_join(tpp04, standardise_vars(abs2004) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2004"),
+  left_join(tpp07, standardise_vars(abs2007) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2007"),
+  left_join(tpp10, standardise_vars(abs2010) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2010"),
+  left_join(tpp13, standardise_vars(abs2013) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2013"),
+  left_join(tpp16, standardise_vars(abs2016) %>% select(-c(UniqueID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2016")
 ) %>% 
-  select(-DivisionID) %>% 
   mutate(year = factor(year)) %>% 
   select(-c(starts_with("Age"), StateAb, LNP_Votes, ALP_Votes, ALP_Percent, TotalVotes,
-    Swing, InternetUse, InternetAccess, EnglishOnly, Other_NonChrist, OtherChrist, Volunteer, EmuneratedElsewhere))
+    Swing, InternetUse, InternetAccess, EnglishOnly, Other_NonChrist, OtherChrist, Volunteer, EmuneratedElsewhere, UniqueID))
 
 # ------------------------------------------------------------------------------------
 
@@ -97,7 +96,7 @@ library(gridExtra)
 grid.arrange(plot_pc1, plot_pc2, plot_pc3, plot_pc4, nrow = 2)
 
 # Do PCA on all
-pca_all <- prcomp(my_df %>% select(-c(LNP_Percent, year))) %>% orientPCs()
+pca_all <- prcomp(my_df %>% select(-c(LNP_Percent, year, DivisionNm))) %>% orientPCs()
 # Plot
 plot_pc_all1 <- pca_all %>% 
   select(Variable, PC1) %>% 
