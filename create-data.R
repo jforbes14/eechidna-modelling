@@ -145,7 +145,8 @@ small_df <- my_df %>%
   select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, DipCert, FamilyRatio,
     AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Mortgage, Renting,
     PublicHousing, MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, 
-    MedianLoanPay, Unemployed, LFParticipation))
+    MedianLoanPay, Unemployed, LFParticipation)) %>% 
+  standardise_vars()
 
 # Order electorates in alphabetical order to match spatial matrix
 
