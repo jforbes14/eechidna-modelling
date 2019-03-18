@@ -24,3 +24,59 @@ mod %>% AIC
 
 
 temp <- whole_df %>% filter(year == 2016) %>% select(LNP_Percent, DivisionNm, Extractive)
+
+
+############################################################################################
+
+new_varimp <- bind_rows(varimp01 %>% mutate(year = 2001),
+  varimp04 %>% mutate(year = 2004), 
+  varimp07 %>% mutate(year = 2007), 
+  varimp10 %>% mutate(year = 2010), 
+  varimp13 %>% mutate(year = 2013), 
+  varimp16 %>% mutate(year = 2016)
+)
+
+new_fiveway01 <- fiveway01
+new_fiveway04 <- fiveway04
+new_fiveway07 <- fiveway07
+new_fiveway10 <- fiveway10
+new_fiveway13 <- fiveway13
+new_fiveway16 <- fiveway16
+
+remove(fiveway01)
+remove(fiveway04)
+remove(fiveway07)
+remove(fiveway10)
+remove(fiveway13)
+remove(fiveway16)
+
+remove(varimp01)
+remove(varimp04)
+remove(varimp07)
+remove(varimp10)
+remove(varimp13)
+remove(varimp16)
+
+
+
+old_fiveway01 <- fiveway01
+old_fiveway04 <- fiveway04
+old_fiveway07 <- fiveway07
+old_fiveway10 <- fiveway10
+old_fiveway13 <- fiveway13
+old_fiveway16 <- fiveway16
+
+remove(fiveway01)
+remove(fiveway04)
+remove(fiveway07)
+remove(fiveway10)
+remove(fiveway13)
+remove(fiveway16)
+
+old_varimp <- bind_rows(varimp01 %>% mutate(year = 2001),
+  varimp04 %>% mutate(year = 2004), 
+  varimp07 %>% mutate(year = 2007), 
+  varimp10 %>% mutate(year = 2010), 
+  varimp13 %>% mutate(year = 2013), 
+  varimp16 %>% mutate(year = 2016)
+)
