@@ -37,9 +37,10 @@ main_effect_plot <- function(my_model, varname, xlimits = NULL, ylimits = NULL) 
   dat <- partial_resids(my_model, varname)
   
   plot <- ggplot(data = dat, aes(x = varname, y = part_resids)) +
-    geom_point() + 
-    geom_smooth(method = "lm") + 
-    theme(axis.title = element_blank()) 
+    geom_point(alpha = 0.7) + 
+    geom_smooth(method = "lm") +
+    theme_light() +
+    theme(axis.title = element_blank(), plot.title = element_text(face = "bold", size = 10, hjust = 0.5))
   
   if (!is.null(xlimits) & !is.null(ylimits)) {
     plot <- plot + coord_cartesian(xlim = xlimits, ylim = ylimits)
@@ -53,51 +54,77 @@ main_effect_plot <- function(my_model, varname, xlimits = NULL, ylimits = NULL) 
 # Main effects
 
 # Born UK
-Born_UK_16 <- main_effect_plot(mod16, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15))
-Born_UK_13 <- main_effect_plot(mod13, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15))
-Born_UK_10 <- main_effect_plot(mod10, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15))
-Born_UK_07 <- main_effect_plot(mod07, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15))
-Born_UK_04 <- main_effect_plot(mod04, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15))
-Born_UK_01 <- main_effect_plot(mod01, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15))
+Born_UK_16 <- main_effect_plot(mod16, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15)) + labs(title = 2016)
+Born_UK_13 <- main_effect_plot(mod13, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15)) + labs(title = 2013)
+Born_UK_10 <- main_effect_plot(mod10, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15)) + labs(title = 2010)
+Born_UK_07 <- main_effect_plot(mod07, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15)) + labs(title = 2007)
+Born_UK_04 <- main_effect_plot(mod04, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15)) + labs(title = 2004)
+Born_UK_01 <- main_effect_plot(mod01, "Born_UK", xlimits = c(-1.4, 5), ylimits = c(-13, 15)) + labs(title = 2001)
 
 grid.arrange(Born_UK_01, Born_UK_04, Born_UK_07, Born_UK_10, Born_UK_13, Born_UK_16, 
   nrow = 2, 
   left = textGrob("Two-party preferred vote (%)", gp = gpar(cex = 0.8), rot = 90), 
   bottom = textGrob("Population born in the United Kingdom", gp = gpar(cex = 0.8)))
 
-# Median Age
-MedianAge_16 <- main_effect_plot(mod16, "MedianAge", ylimits = c(-15,20), xlimits = c(-2.5, 2.8))
-MedianAge_13 <- main_effect_plot(mod13, "MedianAge", ylimits = c(-15,20), xlimits = c(-2.5, 2.8))
-MedianAge_10 <- main_effect_plot(mod10, "MedianAge", ylimits = c(-15,20), xlimits = c(-2.5, 2.8))
-MedianAge_07 <- main_effect_plot(mod07, "MedianAge", ylimits = c(-15,20), xlimits = c(-2.5, 2.8))
-MedianAge_04 <- main_effect_plot(mod04, "MedianAge", ylimits = c(-15,20), xlimits = c(-2.5, 2.8))
-MedianAge_01 <- main_effect_plot(mod01, "MedianAge", ylimits = c(-15,20), xlimits = c(-2.5, 2.8))
-
-grid.arrange(MedianAge_01, MedianAge_04, MedianAge_07, MedianAge_10, MedianAge_13, MedianAge_16, 
-  nrow = 2, 
-  left = textGrob("Two-party preferred vote (%)", gp = gpar(cex = 0.8), rot = 90), 
-  bottom = textGrob("Median Age", gp = gpar(cex = 0.8)))
-
 # Married
-Married_16 <- main_effect_plot(mod16, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5))
-Married_13 <- main_effect_plot(mod13, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5))
-Married_10 <- main_effect_plot(mod10, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5))
-Married_07 <- main_effect_plot(mod07, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5))
-Married_04 <- main_effect_plot(mod04, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5))
-Married_01 <- main_effect_plot(mod01, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5))
+Married_16 <- main_effect_plot(mod16, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5)) + labs(title = 2016)
+Married_13 <- main_effect_plot(mod13, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5)) + labs(title = 2013)
+Married_10 <- main_effect_plot(mod10, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5)) + labs(title = 2010)
+Married_07 <- main_effect_plot(mod07, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5)) + labs(title = 2007)
+Married_04 <- main_effect_plot(mod04, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5)) + labs(title = 2004)
+Married_01 <- main_effect_plot(mod01, "Married", ylimits = c(-13,15), xlimits = c(-4.7, 2.5)) + labs(title = 2001)
 
 grid.arrange(Married_01, Married_04, Married_07, Married_10, Married_13, Married_16, 
   nrow = 2, 
   left = textGrob("Two-party preferred vote (%)", gp = gpar(cex = 0.8), rot = 90), 
   bottom = textGrob("Married", gp = gpar(cex = 0.8)))
 
+# Unemployment
+Unemployment_16 <- main_effect_plot(mod16, "Unemployment", ylimits = c(-15,15), xlimits = c(-2.16, 3.43)) + labs(title = 2016)
+Unemployment_13 <- main_effect_plot(mod13, "Unemployment", ylimits = c(-15,15), xlimits = c(-2.16, 3.43)) + labs(title = 2013)
+Unemployment_10 <- main_effect_plot(mod10, "Unemployment", ylimits = c(-15,15), xlimits = c(-2.16, 3.43)) + labs(title = 2010)
+Unemployment_07 <- main_effect_plot(mod07, "Unemployment", ylimits = c(-15,15), xlimits = c(-2.16, 3.43)) + labs(title = 2007)
+Unemployment_04 <- main_effect_plot(mod04, "Unemployment", ylimits = c(-15,15), xlimits = c(-2.16, 3.43)) + labs(title = 2004)
+Unemployment_01 <- main_effect_plot(mod01, "Unemployment", ylimits = c(-15,15), xlimits = c(-2.16, 3.43)) + labs(title = 2001)
+
+grid.arrange(Unemployment_01, Unemployment_04, Unemployment_07, Unemployment_10, Unemployment_13, Unemployment_16, 
+  nrow = 2, 
+  left = textGrob("Two-party preferred vote (%)", gp = gpar(cex = 0.8), rot = 90), 
+  bottom = textGrob("Unemployment", gp = gpar(cex = 0.8)))
+
+# Transformative
+Transformative_16 <- main_effect_plot(mod16, "Transformative", ylimits = c(-15,15), xlimits = c(-2.41, 3.03)) + labs(title = 2016)
+Transformative_13 <- main_effect_plot(mod13, "Transformative", ylimits = c(-15,15), xlimits = c(-2.41, 3.03)) + labs(title = 2013)
+Transformative_10 <- main_effect_plot(mod10, "Transformative", ylimits = c(-15,15), xlimits = c(-2.41, 3.03)) + labs(title = 2010)
+Transformative_07 <- main_effect_plot(mod07, "Transformative", ylimits = c(-15,15), xlimits = c(-2.41, 3.03)) + labs(title = 2007)
+Transformative_04 <- main_effect_plot(mod04, "Transformative", ylimits = c(-15,15), xlimits = c(-2.41, 3.03)) + labs(title = 2004)
+Transformative_01 <- main_effect_plot(mod01, "Transformative", ylimits = c(-15,15), xlimits = c(-2.41, 3.03)) + labs(title = 2001)
+
+grid.arrange(Transformative_01, Transformative_04, Transformative_07, Transformative_10, Transformative_13, Transformative_16, 
+  nrow = 2, 
+  left = textGrob("Two-party preferred vote (%)", gp = gpar(cex = 0.8), rot = 90), 
+  bottom = textGrob("Transformative", gp = gpar(cex = 0.8)))
+
+# Born_SE_Europe
+Born_SE_Europe_16 <- main_effect_plot(mod16, "Born_SE_Europe", ylimits = c(-15,16), xlimits = c(-0.95, 5.15)) + labs(title = 2016)
+Born_SE_Europe_13 <- main_effect_plot(mod13, "Born_SE_Europe", ylimits = c(-15,16), xlimits = c(-0.95, 5.15)) + labs(title = 2013)
+Born_SE_Europe_10 <- main_effect_plot(mod10, "Born_SE_Europe", ylimits = c(-15,16), xlimits = c(-0.95, 5.15)) + labs(title = 2010)
+Born_SE_Europe_07 <- main_effect_plot(mod07, "Born_SE_Europe", ylimits = c(-15,16), xlimits = c(-0.95, 5.15)) + labs(title = 2007)
+Born_SE_Europe_04 <- main_effect_plot(mod04, "Born_SE_Europe", ylimits = c(-15,16), xlimits = c(-0.95, 5.15)) + labs(title = 2004)
+Born_SE_Europe_01 <- main_effect_plot(mod01, "Born_SE_Europe", ylimits = c(-15,16), xlimits = c(-0.95, 5.15)) + labs(title = 2001)
+
+grid.arrange(Born_SE_Europe_01, Born_SE_Europe_04, Born_SE_Europe_07, Born_SE_Europe_10, Born_SE_Europe_13, Born_SE_Europe_16, 
+  nrow = 2, 
+  left = textGrob("Two-party preferred vote (%)", gp = gpar(cex = 0.8), rot = 90), 
+  bottom = textGrob("Population born in South-Eastern Europe", gp = gpar(cex = 0.8)))
+
 # Different Address
-DiffAddress_16 <- main_effect_plot(mod16, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4))
-DiffAddress_13 <- main_effect_plot(mod13, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4))
-DiffAddress_10 <- main_effect_plot(mod10, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4))
-DiffAddress_07 <- main_effect_plot(mod07, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4))
-DiffAddress_04 <- main_effect_plot(mod04, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4))
-DiffAddress_01 <- main_effect_plot(mod01, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4))
+DiffAddress_16 <- main_effect_plot(mod16, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4)) + labs(title = 2016)
+DiffAddress_13 <- main_effect_plot(mod13, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4)) + labs(title = 2013)
+DiffAddress_10 <- main_effect_plot(mod10, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4)) + labs(title = 2010)
+DiffAddress_07 <- main_effect_plot(mod07, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4)) + labs(title = 2007)
+DiffAddress_04 <- main_effect_plot(mod04, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4)) + labs(title = 2004)
+DiffAddress_01 <- main_effect_plot(mod01, "DiffAddress", ylimits = c(-15,20), xlimits = c(-2.5, 4)) + labs(title = 2001)
 
 grid.arrange(DiffAddress_01, DiffAddress_04, DiffAddress_07, DiffAddress_10, DiffAddress_13, DiffAddress_16, 
   nrow = 2, 
@@ -321,62 +348,32 @@ grid.arrange(Extract_Admin_01, Extract_Admin_04, Extract_Admin_07, Extract_Admin
   bottom = textGrob("Extractive", gp = gpar(cex = 0.8)), 
   left = textGrob("Manager Admin Clerical Sales", gp = gpar(cex = 0.8), rot = 90))
 
-# Born_SE_Europe:OtherLanguageHome
-BornSE_Other_16 <- interaction_plot(mod16, c("Born_SE_Europe", "OtherLanguageHome"), 2016,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
-BornSE_Other_13 <- interaction_plot(mod13, c("Born_SE_Europe", "OtherLanguageHome"), 2013,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
-BornSE_Other_10 <- interaction_plot(mod10, c("Born_SE_Europe", "OtherLanguageHome"), 2010,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
-BornSE_Other_07 <- interaction_plot(mod07, c("Born_SE_Europe", "OtherLanguageHome"), 2007,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
-BornSE_Other_04 <- interaction_plot(mod04, c("Born_SE_Europe", "OtherLanguageHome"), 2004,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
-BornSE_Other_01 <- interaction_plot(mod01, c("Born_SE_Europe", "OtherLanguageHome"), 2001,
-  xlimits = c(min(small_df$Born_SE_Europe) - 0.15, max(small_df$Born_SE_Europe) + 0.15), 
-  ylimits = c(min(small_df$OtherLanguageHome) - 0.15, max(small_df$OtherLanguageHome) + 0.15))
+# MedianAge:OneParent_House
+Age_OP_16 <- interaction_plot(mod16, c("MedianAge", "OneParent_House"), 2016,
+  xlimits = c(min(small_df$MedianAge) - 0.15, max(small_df$MedianAge) + 0.15), 
+  ylimits = c(min(small_df$OneParent_House) - 0.15, max(small_df$OneParent_House) + 0.15))
+Age_OP_13 <- interaction_plot(mod13, c("MedianAge", "OneParent_House"), 2013,
+  xlimits = c(min(small_df$MedianAge) - 0.15, max(small_df$MedianAge) + 0.15), 
+  ylimits = c(min(small_df$OneParent_House) - 0.15, max(small_df$OneParent_House) + 0.15))
+Age_OP_10 <- interaction_plot(mod10, c("MedianAge", "OneParent_House"), 2010,
+  xlimits = c(min(small_df$MedianAge) - 0.15, max(small_df$MedianAge) + 0.15), 
+  ylimits = c(min(small_df$OneParent_House) - 0.15, max(small_df$OneParent_House) + 0.15))
+Age_OP_07 <- interaction_plot(mod07, c("MedianAge", "OneParent_House"), 2007,
+  xlimits = c(min(small_df$MedianAge) - 0.15, max(small_df$MedianAge) + 0.15), 
+  ylimits = c(min(small_df$OneParent_House) - 0.15, max(small_df$OneParent_House) + 0.15))
+Age_OP_04 <- interaction_plot(mod04, c("MedianAge", "OneParent_House"), 2004,
+  xlimits = c(min(small_df$MedianAge) - 0.15, max(small_df$MedianAge) + 0.15), 
+  ylimits = c(min(small_df$OneParent_House) - 0.15, max(small_df$OneParent_House) + 0.15))
+Age_OP_01 <- interaction_plot(mod01, c("MedianAge", "OneParent_House"), 2001,
+  xlimits = c(min(small_df$MedianAge) - 0.15, max(small_df$MedianAge) + 0.15), 
+  ylimits = c(min(small_df$OneParent_House) - 0.15, max(small_df$OneParent_House) + 0.15))
 
-grid.arrange(BornSE_Other_01, BornSE_Other_04, BornSE_Other_07, BornSE_Other_10, BornSE_Other_13, BornSE_Other_16, TPP_scale,
+grid.arrange(Age_OP_01, Age_OP_04, Age_OP_07, Age_OP_10, Age_OP_13, Age_OP_16, TPP_scale,
   nrow = 3, 
   widths = c(1,1,1),
   heights = c(0.25, 1, 1),
   layout_matrix = rbind(c(7, 7, 7),
     c(1,2,3),
     c(4,5,6)),
-  bottom = textGrob("Born SE Europe", gp = gpar(cex = 0.8)), 
-  left = textGrob("Other Language Home", gp = gpar(cex = 0.8), rot = 90))
-
-# Extractive:Unemployed
-Extract_Admin_16 <- interaction_plot(mod16, c("Extractive", "Unemployed"), 2016,
-  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
-  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
-Extract_Admin_13 <- interaction_plot(mod13, c("Extractive", "Unemployed"), 2013,
-  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
-  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
-Extract_Admin_10 <- interaction_plot(mod10, c("Extractive", "Unemployed"), 2010,
-  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
-  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
-Extract_Admin_07 <- interaction_plot(mod07, c("Extractive", "Unemployed"), 2007,
-  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
-  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
-Extract_Admin_04 <- interaction_plot(mod04, c("Extractive", "Unemployed"), 2004,
-  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
-  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
-Extract_Admin_01 <- interaction_plot(mod01, c("Extractive", "Unemployed"), 2001,
-  xlimits = c(min(small_df$Extractive) - 0.15, max(small_df$Extractive) + 0.15), 
-  ylimits = c(min(small_df$Unemployed) - 0.15, max(small_df$Unemployed) + 0.15))
-
-grid.arrange(Extract_Admin_01, Extract_Admin_04, Extract_Admin_07, Extract_Admin_10, Extract_Admin_13, Extract_Admin_16, TPP_scale,
-  nrow = 3, 
-  widths = c(1,1,1),
-  heights = c(0.25, 1, 1),
-  layout_matrix = rbind(c(7, 7, 7),
-    c(1,2,3),
-    c(4,5,6)),
-  bottom = textGrob("Extractive", gp = gpar(cex = 0.8)), 
-  left = textGrob("Unemployed", gp = gpar(cex = 0.8), rot = 90))
+  bottom = textGrob("Median Age", gp = gpar(cex = 0.8)), 
+  left = textGrob("One Parent Households", gp = gpar(cex = 0.8), rot = 90))
