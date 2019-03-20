@@ -134,7 +134,7 @@ grid.arrange(plot_pc_all1, plot_pc_all2, plot_pc_all3, plot_pc_all4, nrow = 2)
 
 # Create final df for modelling
 
-small_df <- my_df %>% 
+factors_df <- my_df %>% 
   mutate(Education = BachelorAbv + HighSchool + Professional + Finance - Laborer - Tradesperson - DipCert,
     FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House -
       SP_House,
@@ -145,8 +145,18 @@ small_df <- my_df %>%
   select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, DipCert, FamilyRatio,
     AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Mortgage, Renting,
     PublicHousing, MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, 
-    MedianLoanPay, Unemployed, LFParticipation)) %>% 
-  standardise_vars()
+    MedianLoanPay, Unemployed, LFParticipation)) 
+
+# Now standardize factors
+
+small_df <- bind_rows(
+  factors_df %>% filter(year == "2001") %>% standardise_vars(),
+  factors_df %>% filter(year == "2004") %>% standardise_vars(),
+  factors_df %>% filter(year == "2007") %>% standardise_vars(),
+  factors_df %>% filter(year == "2010") %>% standardise_vars(),
+  factors_df %>% filter(year == "2013") %>% standardise_vars(),
+  factors_df %>% filter(year == "2016") %>% standardise_vars()
+)
 
 # Order electorates in alphabetical order to match spatial matrix
 
