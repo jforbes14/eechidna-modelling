@@ -165,6 +165,13 @@ small_df <- small_df %>%
 
 save(small_df, file = "data/small_df.rda")
 
+# Model df
+
+model_df <- small_df %>% 
+  select(-c(starts_with("Age"), "Anglican", "Catholic"))
+
+save(model_df, file = "data/model_df.rda")
+
 # ------------------------------------------------------------------------------------
 
 # Get spatial weights
