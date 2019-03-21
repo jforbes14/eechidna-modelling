@@ -321,3 +321,55 @@ basket_age <- function(abs_df) {
       Age35_44, Age45_54, Age55_64, Age65_74, Age75_84, Age85plus, MedianAge))
   return(abs_df)
 }
+
+# ---------------------------------------------------------------------------------
+
+# Drop 1 (LR test) for spatial model
+drop1_sp <- function(my_model, sp_weights) {
+  # Get all covariate names
+  my_names <- names(my_model$coefficients)
+  # Get all interaction names
+  my_ints <- my_names[grepl(":", my_names)]
+  # Remove variables in interactions
+  my_names_in_ints <- unique(unlist(strsplit(my_ints , ":")))
+  reduced_names <- my_names[-c(1, grep(":", my_names))]
+  # Final list of variables to be removed
+  my_main_effects <- reduced_names[!reduced_names %in% my_names_in_ints]
+  drop_list <- c(my_main_effects, my_ints)
+  
+  # Create blank df
+  df <- data.frame(dropped = drop_list, p_chisq = 0)
+  
+  # Get data
+  my_data <- data.frame(my_model$X)
+  names(my_data) <- unlist(dimnames(my_model$X)[2])
+  my_data <- my_data[, -c(1, grep(":", names(my_data)))]
+  # Response
+  my_data$y <- my_model$y
+  resp_var <- strsplit((my_model$call %>% as.character())[2], " ~")[[1]][1]
+  names(my_data)[length(my_data)] <- resp_var
+  
+  for (i in 1:length(drop_list)) {
+    varname <- drop_list[i]
+    
+    # Fit drop model
+    my_formula <- formula(
+      paste((my_model$call %>% as.character())[2], " - ", varname)
+    )
+    drop_model <- errorsarlm(
+      formula = my_formula, 
+      data = my_data,
+      listw = sp_weights
+    )
+    
+    test <- lmtest::lrtest(my_model, drop_model)
+    
+    df$p_chisq[i] <- round(test$`Pr(>Chisq)`[2], 6)
+    
+  }
+  
+  return(df)
+  
+}
+
+# ------------------------------------------------------------------------------------
