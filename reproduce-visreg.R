@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------------------------------------
 
 # Data
-mydata <- model_df %>% filter(year == "2016") %>% dplyr::select(LNP_Percent, AusCitizen, Extractive, Unemployment)
+mydata <- model_df %>% filter(year == "2016") %>% dplyr::select(-c(year, DivisionNm, Extractive, Unemployment, CurrentlyStudying))
 
 # My spatial error model
-my_model <- errorsarlm(LNP_Percent ~ AusCitizen + Extractive + Unemployment, data = mydata,
+my_model <- errorsarlm(LNP_Percent ~ ., data = mydata,
   listw = sp_weights_16)
 my_model <- fmod16
 sp_weights <- sp_weights_16
@@ -16,13 +16,14 @@ varname = "Unemployment"
 my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = NULL, ylimits = NULL) {
   # Extract fitted parameters
   rho <- my_model$lambda
-  sigma <- (((my_model$y - my_model$X%*%my_model$coefficients)^2 %>% sum)/(length(my_model$y-my_model$parameters)))^0.5
+  #sigma <- (((my_model$y - my_model$X%*%my_model$coefficients)^2 %>% sum)/(length(my_model$y-my_model$parameters)))^0.5
+  sigma <- sqrt(sum(my_model$residuals^2)/(nrow(my_model$X)-ncol(my_model$X)))
   
   # Spatial weights
   w_mat <- listw2mat(sp_weights)
   
   # Q - where u = Qe, Q = (I - pW)^-1
-  q_mat <- solve(diag(150) - rho*w_mat)
+  q_mat <- solve(diag(nrow(my_model$X)) - rho*w_mat)
   
   # Omega - QQ'
   omega_mat <- q_mat%*%t(q_mat)
@@ -35,10 +36,10 @@ my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = N
   beta_mat <- my_model$coefficients
   
   # T value
-  t = qt(0.975, 150-4)
+  t = qt(0.975, nrow(my_model$X)-ncol(my_model$X))
   
   # Lambda matrix
-  x <- round(seq(min(my_model$X[, varname])*1.2, max(my_model$X[, varname])*1.2, 0.05), 2)
+  x <- round(seq(min(my_model$X[, varname]), max(my_model$X[, varname]), 0.025), 3)
   lambda_mat <- data.frame(matrix(0, nrow = length(x), ncol = ncol(my_model$X)))
   names(lambda_mat) <- names(my_model$X %>% as.data.frame)
   lambda_mat[, varname] <- x
@@ -69,8 +70,9 @@ my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = N
     geom_ribbon(aes(x = variable, ymin = lower95, ymax = upper95), fill = "grey80") + 
     geom_point(aes(x = variable, y = part_res), data = points_df, size = 0.75, col = "grey50") + 
     geom_line(aes(x = variable, y = fitted), col = "blue", size = 1) +
-    theme_bw() +
-    labs(x = varname, y = "Response")
+    #geom_hline(aes(yintercept = min(upper95)), col = "red") +
+    #geom_hline(aes(yintercept = max(lower95)), col = "purple") +
+    theme_bw() + labs(x = varname, y = "Response")
   
   if (nolabs == TRUE) {
     myplot <- myplot + labs(x = "", y = "")
@@ -84,8 +86,8 @@ my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = N
 }
 
 # Test
-my_visreg(fmod16, sp_weights_16, varname = "Extractive")
-
+my_visreg(fmod04, sp_weights_04, varname = "Born_MidEast")
+my_visreg(my_model, sp_weights_16, varname = "Buddhism")
 # ------------------------------------------------------------------------------------------------
 
 ## LINEAR MODEL EXAMPLE ##
