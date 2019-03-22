@@ -38,8 +38,8 @@ partial_resids <- function(my_model, varname) {
 
 # Standardized main effect plot
 
-my_model <- fmod10
-sp_weights <- sp_weights_10
+my_model <- fmod16
+sp_weights <- sp_weights_16
 varname <- "Unemployment"
 
 std_main_effect_plot <- function(my_model, sp_weights, varname, xlimits = NULL, ylimits = NULL) {
@@ -51,6 +51,9 @@ std_main_effect_plot <- function(my_model, sp_weights, varname, xlimits = NULL, 
   rho <- my_model$lambda
   wmat <- listw2mat(sp_weights)
   scale_mat <- (diag(nrow(wmat)) - rho*wmat)
+  
+  ggplot(aes(sample = my_res), data = NULL) + geom_qq() +geom_qq_line() 
+  ggplot(aes(y = res_star, x = my_model$fitted.values), data = NULL) + geom_point() + geom_smooth()
   
   ## Test
   #x_vec <- my_model$X[, varname]
