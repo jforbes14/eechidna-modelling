@@ -19,33 +19,33 @@ data(abs2016)
 
 # Combine and standardize
 my_df <- bind_rows(
-  left_join(tpp01, standardise_vars(abs2001) %>% select(-c(UniqueID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2001"),
-  left_join(tpp04, standardise_vars(abs2004) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2004"),
-  left_join(tpp07, standardise_vars(abs2007) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2007"),
-  left_join(tpp10, standardise_vars(abs2010) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2010"),
-  left_join(tpp13, standardise_vars(abs2013) %>% select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2013"),
-  left_join(tpp16, standardise_vars(abs2016) %>% select(-c(UniqueID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2016")
+  left_join(tpp01, standardise_vars(abs2001) %>% dplyr::select(-c(UniqueID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2001"),
+  left_join(tpp04, standardise_vars(abs2004) %>% dplyr::select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2004"),
+  left_join(tpp07, standardise_vars(abs2007) %>% dplyr::select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2007"),
+  left_join(tpp10, standardise_vars(abs2010) %>% dplyr::select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2010"),
+  left_join(tpp13, standardise_vars(abs2013) %>% dplyr::select(-UniqueID), by = c("DivisionNm")) %>% mutate(year = "2013"),
+  left_join(tpp16, standardise_vars(abs2016) %>% dplyr::select(-c(UniqueID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2016")
 ) %>% 
   mutate(year = factor(year)) %>% 
-  select(-c(starts_with("Age"), StateAb, LNP_Votes, ALP_Votes, ALP_Percent, TotalVotes,
-    Swing, InternetUse, InternetAccess, EnglishOnly, Other_NonChrist, OtherChrist, Volunteer, EmuneratedElsewhere, UniqueID))
+  dplyr::select(-c(starts_with("Age"), StateAb, LNP_Votes, ALP_Votes, ALP_Percent, TotalVotes,
+    Swing, InternetUse, InternetAccess, EnglishOnly, Other_NonChrist, OtherChrist, Volunteer, EmuneratedElsewhere, UniqueID, Catholic, Anglican))
 
 # ------------------------------------------------------------------------------------
 
 # Principal components
 
 # Scree plots show a structural break after 4 PCs
-pca_16 <- prcomp(my_df %>% filter(year == "2016") %>% select(-c(LNP_Percent, year, DivisionNm)))
+pca_16 <- prcomp(my_df %>% filter(year == "2016") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm)))
 screeplot(pca_16, npcs = 24, type = "lines")
-pca_13 <- prcomp(my_df %>% filter(year == "2013") %>% select(-c(LNP_Percent, year, DivisionNm)))
+pca_13 <- prcomp(my_df %>% filter(year == "2013") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm)))
 screeplot(pca_13, npcs = 24, type = "lines")
-pca_10 <- prcomp(my_df %>% filter(year == "2010") %>% select(-c(LNP_Percent, year, DivisionNm)))
+pca_10 <- prcomp(my_df %>% filter(year == "2010") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm)))
 screeplot(pca_10, npcs = 24, type = "lines")
-pca_07 <- prcomp(my_df %>% filter(year == "2007") %>% select(-c(LNP_Percent, year, DivisionNm)))
+pca_07 <- prcomp(my_df %>% filter(year == "2007") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm)))
 screeplot(pca_07, npcs = 24, type = "lines")
-pca_04 <- prcomp(my_df %>% filter(year == "2004") %>% select(-c(LNP_Percent, year, DivisionNm)))
+pca_04 <- prcomp(my_df %>% filter(year == "2004") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm)))
 screeplot(pca_04, npcs = 24, type = "lines")
-pca_01 <- prcomp(my_df %>% filter(year == "2001") %>% select(-c(LNP_Percent, year, DivisionNm)))
+pca_01 <- prcomp(my_df %>% filter(year == "2001") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm)))
 screeplot(pca_01, npcs = 24, type = "lines")
 
 # Combine and orient
@@ -61,7 +61,7 @@ pca_loadings <- bind_rows(
 
 # Plot
 plot_pc1 <- pca_loadings %>% 
-  select(Variable, PC1, year) %>% 
+  dplyr::select(Variable, PC1, year) %>% 
   gather(key = "PC", value = "Loading", -c(Variable, year)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point() + geom_line(aes(col = "orange", group = Variable)) + 
@@ -69,7 +69,7 @@ plot_pc1 <- pca_loadings %>%
   labs(x = "Variable") + ggtitle("PC1") + guides(col = F)
 
 plot_pc2 <- pca_loadings %>% 
-  select(Variable, PC2, year) %>% 
+  dplyr::select(Variable, PC2, year) %>% 
   gather(key = "PC", value = "Loading", -c(Variable, year)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point() + geom_line(aes(col = "orange", group = Variable)) + 
@@ -77,7 +77,7 @@ plot_pc2 <- pca_loadings %>%
   labs(x = "Variable") + ggtitle("PC2") + guides(col = F)
 
 plot_pc3 <- pca_loadings %>% 
-  select(Variable, PC3, year) %>% 
+  dplyr::select(Variable, PC3, year) %>% 
   gather(key = "PC", value = "Loading", -c(Variable, year)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point() + geom_line(aes(col = "orange", group = Variable)) + 
@@ -85,7 +85,7 @@ plot_pc3 <- pca_loadings %>%
   labs(x = "Variable") + ggtitle("PC3") + guides(col = F)
 
 plot_pc4 <- pca_loadings %>% 
-  select(Variable, PC4, year) %>% 
+  dplyr::select(Variable, PC4, year) %>% 
   gather(key = "PC", value = "Loading", -c(Variable, year)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point() + geom_line(aes(col = "orange", group = Variable)) + 
@@ -96,10 +96,10 @@ library(gridExtra)
 grid.arrange(plot_pc1, plot_pc2, plot_pc3, plot_pc4, nrow = 2)
 
 # Do PCA on all
-pca_all <- prcomp(my_df %>% select(-c(LNP_Percent, year, DivisionNm))) %>% orientPCs()
+pca_all <- prcomp(my_df %>% dplyr::select(-c(LNP_Percent, year, DivisionNm))) %>% orientPCs()
 # Plot
 plot_pc_all1 <- pca_all %>% 
-  select(Variable, PC1) %>% 
+  dplyr::select(Variable, PC1) %>% 
   gather(key = "PC", value = "Loading", -c(Variable)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point(aes(col = (abs(Loading) > 0.15))) +  
@@ -107,7 +107,7 @@ plot_pc_all1 <- pca_all %>%
   labs(x = "Variable") + ggtitle("PC1") + guides(col = F)
 
 plot_pc_all2 <- pca_all %>% 
-  select(Variable, PC2) %>% 
+  dplyr::select(Variable, PC2) %>% 
   gather(key = "PC", value = "Loading", -c(Variable)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point(aes(col = (abs(Loading) > 0.15))) +  
@@ -115,7 +115,7 @@ plot_pc_all2 <- pca_all %>%
   labs(x = "Variable") + ggtitle("PC2") + guides(col = F)
 
 plot_pc_all3 <- pca_all %>% 
-  select(Variable, PC3) %>% 
+  dplyr::select(Variable, PC3) %>% 
   gather(key = "PC", value = "Loading", -c(Variable)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point(aes(col = (abs(Loading) > 0.15))) +  
@@ -123,7 +123,7 @@ plot_pc_all3 <- pca_all %>%
   labs(x = "Variable") + ggtitle("PC3") + guides(col = F)
 
 plot_pc_all4 <- pca_all %>% 
-  select(Variable, PC4) %>% 
+  dplyr::select(Variable, PC4) %>% 
   gather(key = "PC", value = "Loading", -c(Variable)) %>%
   ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
   geom_point(aes(col = (abs(Loading) > 0.15))) + 
@@ -142,7 +142,7 @@ factors_df <- my_df %>%
     RentLoanPrice = MedianRent + MedianLoanPay,
     Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome,
     Unemployment = Unemployed - LFParticipation) %>% 
-  select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, DipCert, FamilyRatio,
+  dplyr::select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, DipCert, FamilyRatio,
     AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Mortgage, Renting,
     PublicHousing, MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, 
     MedianLoanPay, Unemployed, LFParticipation)) 
@@ -160,17 +160,11 @@ small_df <- bind_rows(
 
 # Order electorates in alphabetical order to match spatial matrix
 
-small_df <- small_df %>% 
+model_df <- small_df %>% 
   arrange(year, DivisionNm)
 
-save(small_df, file = "data/small_df.rda")
-
-# Model df
-
-model_df <- small_df %>% 
-  select(-c(starts_with("Age"), "Anglican", "Catholic"))
-
 save(model_df, file = "data/model_df.rda")
+
 
 # ------------------------------------------------------------------------------------
 
