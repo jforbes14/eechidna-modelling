@@ -1,6 +1,22 @@
 # Producing visreg style plots for SEM
 
 # ------------------------------------------------------------------------------------------------
+# PICK UP HERE: TRY DOING GLS MYSELF AND SEE IF I GET THE SAME RESULT AS ERRORSARLM
+# POTENTIALLY THE SIGMA MIGHT BE WRONG IN SPDEP
+
+# OLS of transformed
+rho <- my_model$lambda
+w_mat <- listw2mat(sp_weights)
+trans_mat <- diag(nrow(my_model$X)) - rho*w_mat
+y_star <- trans_mat%*%mydata$LNP_Percent
+x_star <- trans_mat%*%as.matrix(data.frame(Intercept = 1, model_df %>% filter(year == 
+    "2016") %>% dplyr::select(-c(year, DivisionNm, LNP_Percent))))
+df_star <- data.frame(LNP_Percent = y_star, x_star)
+names(df_star) <- c("LNP_Percent", dimnames(x_star)[[2]])
+glsmod <- lm(LNP_Percent ~ . , data = df_star)
+summary(glsmod)
+
+# ------------------------------------------------------------------------------------------------
 
 # Data
 mydata <- model_df %>% filter(year == "2016") %>% dplyr::select(-c(year, DivisionNm, Extractive, Unemployment, CurrentlyStudying))
