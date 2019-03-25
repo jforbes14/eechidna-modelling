@@ -27,12 +27,18 @@ my_fgls <- function(my_formula, my_data, sp_weights) {
   # GLS model
   my_formula <- formula(paste0(my_formula,  " - 1"))
   gls_model <- gls(my_formula, gls_data)
+  
+  # Call to function with stargazer
+  gls_model$call$model <- formula(paste0("LNP_Percent ~ ", paste0(names(gls_data)[-1], collapse = " + ")))
+  
+  # Rho and data
   gls_model$rho_df <- rho_df
   gls_model$gls_data <- gls_data
   gls_model$my_data <- my_data
   
   return(gls_model)
 }
+
 
 # --------------------------------------------------------------------------------------------------
 
