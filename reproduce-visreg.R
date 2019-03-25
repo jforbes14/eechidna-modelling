@@ -2,21 +2,10 @@
 
 # ------------------------------------------------------------------------------------------------
 
-# Data
-mydata <- model_df %>% filter(year == "2016") %>% dplyr::select(-c(year, DivisionNm, Extractive, Unemployment, CurrentlyStudying))
-
-# My spatial error model
-my_model <- errorsarlm(LNP_Percent ~ ., data = mydata,
-  listw = sp_weights_16)
-my_model <- fmod13
-sp_weights <- sp_weights_13
-varname = "FamHouseSize"
-
-my_model <- glsmod16
-sp_weights <- sp_weights_16
-
 # Function to produce visreg style conditional plots
-my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = NULL, ylimits = NULL) {
+my_visreg <- function(my_model, sp_weights, varname, 
+  nolabs = FALSE, xlimits = NULL, ylimits = NULL, year = "") {
+  
   # Extract fitted parameters
   rho <- my_model$rho_df$estimate
   sigma <- sqrt(sum(my_model$residuals^2)/(my_model$dims$N-my_model$dims$p))
@@ -51,14 +40,6 @@ my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = N
   lambda_mat$Intercept <- 1
   lambda_mat <- as.matrix(lambda_mat)
   
-  # Lambda matrix
-  #x <- round(seq(min(my_model$X[, varname]), max(my_model$X[, varname]), 0.025), 3)
-  #lambda_mat <- data.frame(matrix(0, nrow = length(x), ncol = ncol(my_model$X)))
-  #names(lambda_mat) <- names(my_model$X %>% as.data.frame)
-  #lambda_mat[, varname] <- x
-  #lambda_mat[, "(Intercept)"] <- 1
-  #lambda_mat <- as.matrix(lambda_mat)
-  
   # Confidence interval
   plot_df <- data.frame(variable = x, fitted = lambda_mat%*%beta_mat, variance = 0)
   
@@ -83,9 +64,12 @@ my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = N
     geom_ribbon(aes(x = variable, ymin = lower95, ymax = upper95), fill = "grey80") + 
     geom_point(aes(x = variable, y = part_res), data = points_df, size = 0.75, col = "grey50") + 
     geom_line(aes(x = variable, y = fitted), col = "blue", size = 1) +
-    geom_hline(aes(yintercept = min(upper95)), col = "red") +
-    geom_hline(aes(yintercept = max(lower95)), col = "blue") +
-    theme_bw() + labs(x = varname, y = "Response")
+    #geom_hline(aes(yintercept = min(upper95)), col = "red") +
+    #geom_hline(aes(yintercept = max(lower95)), col = "blue") +
+    theme_bw() + 
+    labs(x = varname, y = "Response") + 
+    ggtitle(year) +
+    theme(plot.title = element_text(face = "bold", size = 10, hjust = 0.5))
   
   if (nolabs == TRUE) {
     myplot <- myplot + labs(x = "", y = "")
@@ -101,6 +85,29 @@ my_visreg <- function(my_model, sp_weights, varname, nolabs = FALSE, xlimits = N
 # Test
 my_visreg(glsmod04, sp_weights_04, varname = "Born_MidEast")
 my_visreg(glsmod13, sp_weights_13, varname = "Distributive")
+
+# ------------------------------------------------------------------------------------------------
+
+# Now make a grid for the 6 elections
+library(gridExtra)
+library(grid)
+varname = "Incomes"
+grid_visreg <- function(varname, xvar_title, xlimits, ylimits) {
+  p16 <- my_visreg(glsmod16, sp_weights_16, varname = varname, nolabs = T, year = "2016", xlimits, ylimits)
+  p13 <- my_visreg(glsmod13, sp_weights_13, varname = varname, nolabs = T, year = "2013", xlimits, ylimits)
+  p10 <- my_visreg(glsmod10, sp_weights_10, varname = varname, nolabs = T, year = "2010", xlimits, ylimits)
+  p07 <- my_visreg(glsmod07, sp_weights_07, varname = varname, nolabs = T, year = "2007", xlimits, ylimits)
+  p04 <- my_visreg(glsmod04, sp_weights_04, varname = varname, nolabs = T, year = "2004", xlimits, ylimits)
+  p01 <- my_visreg(glsmod01, sp_weights_01, varname = varname, nolabs = T, year = "2001", xlimits, ylimits)
+  
+  plots <- grid.arrange(p01, p04, p07, p10, p13, p16, nrow = 2, 
+    left = textGrob("Two-party preferred vote (%)", gp = gpar(cex = 0.8), rot = 90), 
+    bottom = textGrob(xvar_title, gp = gpar(cex = 0.8)))
+  
+  return(plots)
+}
+
+grid_visreg("Incomes", xvar_title = "Incomes", xlimits = c(-1.5, 3.6), ylimits = c(30, 95))
 
 # ------------------------------------------------------------------------------------------------
 
