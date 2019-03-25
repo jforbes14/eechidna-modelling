@@ -161,7 +161,8 @@ small_df <- bind_rows(
 # Order electorates in alphabetical order to match spatial matrix
 
 model_df <- small_df %>% 
-  arrange(year, DivisionNm)
+  arrange(year, DivisionNm) %>% 
+  dplyr::select(order(colnames(.)))
 
 save(model_df, file = "data/model_df.rda")
 
