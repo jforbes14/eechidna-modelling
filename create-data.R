@@ -17,6 +17,14 @@ data(abs2010)
 data(abs2013)
 data(abs2016)
 
+# Take log of indigneous
+abs2016 <- abs2016 %>% mutate(Indigenous = log(Indigenous))
+abs2013 <- abs2013 %>% mutate(Indigenous = log(Indigenous))
+abs2010 <- abs2010 %>% mutate(Indigenous = log(Indigenous))
+abs2007 <- abs2007 %>% mutate(Indigenous = log(Indigenous))
+abs2004 <- abs2004 %>% mutate(Indigenous = log(Indigenous))
+abs2001 <- abs2001 %>% mutate(Indigenous = log(Indigenous))
+
 # Combine and standardize
 my_df <- bind_rows(
   left_join(tpp01, standardise_vars(abs2001) %>% dplyr::select(-c(UniqueID, Area, ends_with("NS"), Population)), by = c("DivisionNm", "StateAb"="State")) %>% mutate(year = "2001"),
