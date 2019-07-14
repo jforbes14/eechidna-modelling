@@ -43,84 +43,105 @@ my_df <- bind_rows(
 ) %>% 
   mutate(year = factor(year)) %>% 
   dplyr::select(-c(Population, StateAb, LNP_Votes, ALP_Votes, ALP_Percent, TotalVotes,
-    Swing, InternetUse, InternetAccess, EnglishOnly, Other_NonChrist, OtherChrist, Volunteer, EmuneratedElsewhere, UniqueID, Catholic, Anglican)) 
-
-## ------------------------------------------------------------------------------------------------ ##
-
-# Group variables that are very highly correlated and probably describe the same information
-
-# Incomes
-cor(my_df %>% select(contains("Income")))
-
-# Job type
-cor(my_df %>% select(c(Professional, Finance)))
-cor(my_df %>% select(c(Laborer, Tradesperson)))
-cor(my_df %>% select(c(Distributive, Transformative)))
-  
-# Education
-cor(my_df %>% select(c(BachelorAbv, HighSchool, DipCert, Professional)))
-
-# Property ownership
-cor(my_df %>% select(c(Owned, Renting)))
-
-# Loan price
-cor(my_df %>% select(c(MedianRent, MedianLoanPay)))
-
-
-# Unemployment
-cor(my_df %>% select(c(Unemployed, LFParticipation)))
-
-# Family and house size
-cor(my_df %>% select(c(FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House)))
-
-# Age brackets
-# 0-19, 20-44, 45-above are the three logical brackets because of correlations
-cor(my_df %>% select(starts_with("Age"))) %>% View
-
-# Removing other variables (if needed)
-# Mortgage, 
-  
-my_df2 <- my_df %>% 
-mutate(Education = BachelorAbv + HighSchool + Professional - DipCert,
-  LaborerTrades = Laborer + Tradesperson,
-  DistributeTransform = Distributive + Transformative,
-  FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House -
-    SP_House,
-  PropertyOwned = Owned - Renting,
-  RentLoanPrice = MedianRent + MedianLoanPay,
-  Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome,
-  Unemployment = Unemployed - LFParticipation,
-  Band_00_19 = Age00_04 + Age05_14 + Age15_19,
+    Swing, InternetUse, InternetAccess, EnglishOnly, Other_NonChrist, OtherChrist, Volunteer, EmuneratedElsewhere, UniqueID, Catholic, Anglican)) %>% 
+  mutate(Band_00_19 = Age00_04 + Age05_14 + Age15_19,
     Band_20_34 = Age20_24 + Age25_34,
     Band_35_54 = Age35_44 + Age45_54,
     Band_55plus = Age55_64 + Age65_74 + Age75_84 + Age85plus) %>% 
-  select(-c(starts_with("Age"), MedianAge, Band_55plus, BachelorAbv, HighSchool, Laborer, Tradesperson, DipCert,
-    FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Renting, 
-    MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, MedianLoanPay, Unemployed, 
-    LFParticipation, Professional)) %>% 
-  select(-c(BornElsewhere, PublicHousing, Mortgage, OtherLanguageHome, Distributive, Transformative))
+  select(-starts_with("Age")) 
+
+## ------------------------------------------------------------------------------------------------ ##
+
+pca_16 <- prcomp(my_df %>% filter(year == "2016") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"))))
+screeplot(pca_16, npcs = 24, type = "lines")
+pca_13 <- prcomp(my_df %>% filter(year == "2013") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"))))
+screeplot(pca_13, npcs = 24, type = "lines")
+pca_10 <- prcomp(my_df %>% filter(year == "2010") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"))))
+screeplot(pca_10, npcs = 24, type = "lines")
+pca_07 <- prcomp(my_df %>% filter(year == "2007") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"))))
+screeplot(pca_07, npcs = 24, type = "lines")
+pca_04 <- prcomp(my_df %>% filter(year == "2004") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"))))
+screeplot(pca_04, npcs = 24, type = "lines")
+pca_01 <- prcomp(my_df %>% filter(year == "2001") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"))))
+screeplot(pca_01, npcs = 24, type = "lines")
+
+## ------------------------------------------------------------------------------------------------ ##
+
+# Do PCA on all
+pca_all <- prcomp(temp %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"), MedianAge))) %>% orientPCs()
+# Plot
+plot_pc_all1 <- pca_all %>% 
+  dplyr::select(Variable, PC1) %>% 
+  gather(key = "PC", value = "Loading", -c(Variable)) %>%
+  ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
+  geom_point(aes(col = (abs(Loading) > 0.15))) +  
+  theme(axis.text.x = element_text(angle = 60, size = 6, hjust = 1)) +
+  labs(x = "Variable") + ggtitle("PC1") + guides(col = F)
+
+plot_pc_all2 <- pca_all %>% 
+  dplyr::select(Variable, PC2) %>% 
+  gather(key = "PC", value = "Loading", -c(Variable)) %>%
+  ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
+  geom_point(aes(col = (abs(Loading) > 0.15))) +  
+  theme(axis.text.x = element_text(angle = 60, size = 6, hjust = 1)) +
+  labs(x = "Variable") + ggtitle("PC2") + guides(col = F)
+
+plot_pc_all3 <- pca_all %>% 
+  dplyr::select(Variable, PC3) %>% 
+  gather(key = "PC", value = "Loading", -c(Variable)) %>%
+  ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
+  geom_point(aes(col = (abs(Loading) > 0.15))) +  
+  theme(axis.text.x = element_text(angle = 60, size = 6, hjust = 1)) +
+  labs(x = "Variable") + ggtitle("PC3") + guides(col = F)
+
+plot_pc_all4 <- pca_all %>% 
+  dplyr::select(Variable, PC4) %>% 
+  gather(key = "PC", value = "Loading", -c(Variable)) %>%
+  ggplot(aes(x = reorder(Variable, -Loading), y = Loading)) + 
+  geom_point(aes(col = (abs(Loading) > 0.15))) + 
+  theme(axis.text.x = element_text(angle = 60, size = 6, hjust = 1)) +
+  labs(x = "Variable") + ggtitle("PC4") + guides(col = F)
+
+grid.arrange(plot_pc_all1, plot_pc_all2, plot_pc_all3, plot_pc_all4, nrow = 2)
+
+
+## ------------------------------------------------------------------------------------------------ ##
+
+# Create final df for modelling
+
+factors_df <- my_df %>% 
+  mutate(Education = BachelorAbv + HighSchool + Professional + Finance,
+    LaborerTrades = Laborer + Tradesperson,
+    FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House -
+      SP_House,
+    PropertyOwned = Owned + Mortgage - Renting - PublicHousing,
+    RentLoanPrice = MedianRent + MedianLoanPay,
+    Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome,
+    Unemployment = Unemployed - LFParticipation) %>% 
+  dplyr::select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, FamilyRatio,
+    AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Mortgage, Renting,
+    PublicHousing, MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, 
+    MedianLoanPay, Unemployed, LFParticipation)) 
+
+## ------------------------------------------------------------------------------------------------ ##
 
 # Now standardize factors
 
 small_df2 <- bind_rows(
-  my_df2 %>% filter(year == "2001") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2004") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2007") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2010") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2013") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2016") %>% standardise_vars()
+  factors_df %>% filter(year == "2001") %>% standardise_vars(),
+  factors_df %>% filter(year == "2004") %>% standardise_vars(),
+  factors_df %>% filter(year == "2007") %>% standardise_vars(),
+  factors_df %>% filter(year == "2010") %>% standardise_vars(),
+  factors_df %>% filter(year == "2013") %>% standardise_vars(),
+  factors_df %>% filter(year == "2016") %>% standardise_vars()
 )
 
 # Order electorates in alphabetical order to match spatial matrix
 
 model_df2 <- small_df2 %>% 
   arrange(year, DivisionNm) %>% 
-  dplyr::select(order(colnames(.)))
-
-save(model_df2, file = "data/model_df2.rda")
-
-# Check for outliers
-#abs2016 %>% select(contains("Media")) %>% gather("key", "value") %>% ggplot(aes(x = key, y = log(value))) + geom_jitter()
+  dplyr::select(order(colnames(.))) %>% 
+  select(-Band_55plus)
 
 
 # ------------------------------------------------------------------------------------
@@ -239,3 +260,90 @@ p10 <- grid_visreg("BornAsia")
 p11 <- grid_visreg("Education")
 p12 <- grid_visreg("BornSEEuro")
 p13 <- grid_visreg("DeFacto")
+
+
+
+
+
+
+
+
+
+
+## ------------------------------------------------------------------------------------------------ ##
+
+
+# Group variables that are very highly correlated and probably describe the same information
+
+# Incomes
+cor(my_df %>% select(contains("Income")))
+
+# Job type
+cor(my_df %>% select(c(Professional, Finance)))
+cor(my_df %>% select(c(DipCert, Laborer, Tradesperson)))
+cor(my_df %>% select(c(Distributive, Transformative)))
+  
+# Education
+cor(my_df %>% select(c(BachelorAbv, HighSchool, DipCert, Professional)))
+
+# Property ownership
+cor(my_df %>% select(c(Owned, Renting)))
+
+# Loan price
+cor(my_df %>% select(c(MedianRent, MedianLoanPay)))
+
+
+# Unemployment
+cor(my_df %>% select(c(Unemployed, LFParticipation)))
+
+# Family and house size
+cor(my_df %>% select(c(FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House)))
+
+# Age brackets
+# 0-19, 20-44, 45-above are the three logical brackets because of correlations
+cor(my_df %>% select(starts_with("Age"))) %>% View
+
+# Removing other variables (if needed)
+# Mortgage, 
+  
+my_df2 <- my_df %>% 
+mutate(Education = BachelorAbv + HighSchool + Professional - DipCert,
+  LaborerTrades = Laborer + Tradesperson,
+  DistributeTransform = Distributive + Transformative,
+  FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House -
+    SP_House,
+  PropertyOwned = Owned - Renting,
+  RentLoanPrice = MedianRent + MedianLoanPay,
+  Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome,
+  Unemployment = Unemployed - LFParticipation,
+  Band_00_19 = Age00_04 + Age05_14 + Age15_19,
+    Band_20_34 = Age20_24 + Age25_34,
+    Band_35_54 = Age35_44 + Age45_54,
+    Band_55plus = Age55_64 + Age65_74 + Age75_84 + Age85plus) %>% 
+  select(-c(starts_with("Age"), MedianAge, Band_55plus, BachelorAbv, HighSchool, Laborer, Tradesperson, DipCert,
+    FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Renting, 
+    MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, MedianLoanPay, Unemployed, 
+    LFParticipation, Professional)) %>% 
+  select(-c(BornElsewhere, PublicHousing, Mortgage, OtherLanguageHome, Distributive, Transformative))
+
+# Now standardize factors
+
+small_df2 <- bind_rows(
+  my_df2 %>% filter(year == "2001") %>% standardise_vars(),
+  my_df2 %>% filter(year == "2004") %>% standardise_vars(),
+  my_df2 %>% filter(year == "2007") %>% standardise_vars(),
+  my_df2 %>% filter(year == "2010") %>% standardise_vars(),
+  my_df2 %>% filter(year == "2013") %>% standardise_vars(),
+  my_df2 %>% filter(year == "2016") %>% standardise_vars()
+)
+
+# Order electorates in alphabetical order to match spatial matrix
+
+model_df2 <- small_df2 %>% 
+  arrange(year, DivisionNm) %>% 
+  dplyr::select(order(colnames(.)))
+
+save(model_df2, file = "data/model_df2.rda")
+
+# Check for outliers
+#abs2016 %>% select(contains("Media")) %>% gather("key", "value") %>% ggplot(aes(x = key, y = log(value))) + geom_jitter()
