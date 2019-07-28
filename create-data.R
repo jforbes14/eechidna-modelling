@@ -17,13 +17,13 @@ data(abs2010)
 data(abs2013)
 data(abs2016)
 
-# Take log of indigneous
-abs2016 <- abs2016 %>% mutate(Indigenous = log(Indigenous))
-abs2013 <- abs2013 %>% mutate(Indigenous = log(Indigenous))
-abs2010 <- abs2010 %>% mutate(Indigenous = log(Indigenous))
-abs2007 <- abs2007 %>% mutate(Indigenous = log(Indigenous))
-abs2004 <- abs2004 %>% mutate(Indigenous = log(Indigenous))
-abs2001 <- abs2001 %>% mutate(Indigenous = log(Indigenous))
+# Take log of religions
+abs2016 <- abs2016 %>% mutate(Indigenous = log(Indigenous), Judaism = log(Judaism), Islam = log(Islam), Buddhism = log(Buddhism))
+abs2013 <- abs2013 %>% mutate(Indigenous = log(Indigenous), Judaism = log(Judaism), Islam = log(Islam), Buddhism = log(Buddhism))
+abs2010 <- abs2010 %>% mutate(Indigenous = log(Indigenous), Judaism = log(Judaism), Islam = log(Islam), Buddhism = log(Buddhism))
+abs2007 <- abs2007 %>% mutate(Indigenous = log(Indigenous), Judaism = log(Judaism), Islam = log(Islam), Buddhism = log(Buddhism))
+abs2004 <- abs2004 %>% mutate(Indigenous = log(Indigenous), Judaism = log(Judaism), Islam = log(Islam), Buddhism = log(Buddhism))
+abs2001 <- abs2001 %>% mutate(Indigenous = log(Indigenous), Judaism = log(Judaism), Islam = log(Islam), Buddhism = log(Buddhism))
 
 # Combine and standardize
 my_df <- bind_rows(
