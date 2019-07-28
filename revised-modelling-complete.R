@@ -10,6 +10,8 @@
 # Loading the entire dataset
 library(eechidna)
 library(tidyverse)
+library(gridExtra)
+library(nlme)
 
 data(tpp01)
 data(tpp04)
@@ -48,7 +50,7 @@ my_df <- bind_rows(
     Band_20_34 = Age20_24 + Age25_34,
     Band_35_54 = Age35_44 + Age45_54,
     Band_55plus = Age55_64 + Age65_74 + Age75_84 + Age85plus) %>% 
-  select(-starts_with("Age")) 
+  select(-c(starts_with("Age"), MedianAge)) 
 
 ## ------------------------------------------------------------------------------------------------ ##
 
@@ -68,7 +70,7 @@ screeplot(pca_01, npcs = 24, type = "lines")
 ## ------------------------------------------------------------------------------------------------ ##
 
 # Do PCA on all
-pca_all <- prcomp(temp %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"), MedianAge))) %>% orientPCs()
+pca_all <- prcomp(my_df %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band")))) %>% orientPCs()
 # Plot
 plot_pc_all1 <- pca_all %>% 
   dplyr::select(Variable, PC1) %>% 
@@ -262,10 +264,147 @@ p12 <- grid_visreg("BornSEEuro")
 p13 <- grid_visreg("DeFacto")
 
 
+## ------------------------------------------------------------------------------------------------ ##
+
+# Multicollinearity in resultant variable set
+
+# Variance inflation factor (VIF)
+# vif = 1/(1 - r2)
+
+my_vif <- function(fgls_mod) {
+  vif_df <- data.frame(variable = names(fgls_mod$coefficients)[-1], vif = 0)
+  
+  for (i in 1:length(vif_df$variable)) {
+    myvar = vif_df$variable[i] %>% as.character()
+    othervar = vif_df$variable[-i] %>% as.character()
+    formula = paste(myvar, "~", paste(othervar, collapse = " + "))
+    mymod <- lm(formula, data = fgls_mod$gls_data %>% select(-LNP_Percent))
+    r2 = (summary(mymod))$r.squared
+    vif = 1/(1-r2)
+    
+    vif_df$vif[i] = vif
+  }
+  
+  return(vif_df)
+}
+
+# Plot VIF (using OLS)
+my_vif(glsmod16) %>% mutate(year = "2016") %>% 
+  bind_rows(my_vif(glsmod13) %>% mutate(year = "2013")) %>% 
+  bind_rows(my_vif(glsmod10) %>% mutate(year = "2010")) %>% 
+  bind_rows(my_vif(glsmod07) %>% mutate(year = "2007")) %>% 
+  bind_rows(my_vif(glsmod04) %>% mutate(year = "2004")) %>% 
+  bind_rows(my_vif(glsmod01) %>% mutate(year = "2001")) %>%
+    ggplot(aes(x = variable, y = vif, col = year)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
 
 
+## ------------------------------------------------------------------------------------------------ ##
 
+# Raw variable scales and how they compare to the effect
 
+# Eyeballing the large estimated coefficients and their min/max - seems fine
+
+## ------------------------------------------------------------------------------------------------ ##
+
+# Model with significant effects only
+
+sig_vars <- coef_df %>% 
+  group_by(variable) %>% 
+  summarise(n = sum(p < 0.05)) %>% 
+  filter(n > 0, variable != "Intercept") %>% 
+  select(variable) %>% unlist %>% unname %>% as.character()
+
+# Subset with only significant variables
+subset_df <- model_df2 %>% 
+  select(sig_vars, year, DivisionNm, LNP_Percent)
+
+# 2016
+glsmod16_subset <- my_fgls(full_formula, 
+  my_data = subset_df %>% filter(year == "2016"),
+  sp_weights = sp_weights_16)
+
+# 2013
+glsmod13_subset <- my_fgls(full_formula, 
+  my_data = subset_df %>% filter(year == "2013"),
+  sp_weights = sp_weights_13)
+
+# 2010
+glsmod10_subset <- my_fgls(full_formula, 
+  my_data = subset_df %>% filter(year == "2010"),
+  sp_weights = sp_weights_10)
+
+# 2007
+glsmod07_subset <- my_fgls(full_formula, 
+  my_data = subset_df %>% filter(year == "2007"),
+  sp_weights = sp_weights_07)
+
+# 2004
+glsmod04_subset <- my_fgls(full_formula, 
+  my_data = subset_df %>% filter(year == "2004"),
+  sp_weights = sp_weights_04)
+
+# 2001
+glsmod01_subset <- my_fgls(full_formula, 
+  my_data = subset_df %>% filter(year == "2001"),
+  sp_weights = sp_weights_01)
+
+## Visualise coefficients and significance
+
+coef_subset_df <- bind_rows(
+  data.frame(variable = glsmod16_subset$coefficients %>% names, estimate = glsmod16_subset$coefficients %>% unname, se = summary(glsmod16_subset)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod16_subset)$tTable[, "p-value"] %>% unname, year = 2016),
+  data.frame(variable = glsmod13_subset$coefficients %>% names, estimate = glsmod13_subset$coefficients %>% unname, se = summary(glsmod13_subset)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod13_subset)$tTable[, "p-value"] %>% unname, year = 2013),
+  data.frame(variable = glsmod10_subset$coefficients %>% names, estimate = glsmod10_subset$coefficients %>% unname, se = summary(glsmod10_subset)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod10_subset)$tTable[, "p-value"] %>% unname, year = 2010),
+  data.frame(variable = glsmod07_subset$coefficients %>% names, estimate = glsmod07_subset$coefficients %>% unname, se = summary(glsmod07_subset)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod07_subset)$tTable[, "p-value"] %>% unname, year = 2007),
+  data.frame(variable = glsmod04_subset$coefficients %>% names, estimate = glsmod04_subset$coefficients %>% unname, se = summary(glsmod04_subset)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod04_subset)$tTable[, "p-value"] %>% unname, year = 2004),
+  data.frame(variable = glsmod01_subset$coefficients %>% names, estimate = glsmod01_subset$coefficients %>% unname, se = summary(glsmod01_subset)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod01_subset)$tTable[, "p-value"] %>% unname, year = 2001)
+)
+
+# Plot together
+coef_subset_vis <- coef_df %>% 
+  left_join(coef_subset_df %>% select(-c(se, p)) %>% rename(subset_est = estimate), 
+    by = c("variable", "year")) %>% 
+  filter(!is.na(subset_est))
+
+coef_subset_vis %>% 
+  filter(variable != "Intercept") %>% 
+  mutate(upper95 = estimate + 1.96*se, lower95 = estimate - 1.96*se) %>% 
+  ggplot() +
+  geom_point(aes(x = year, y = estimate, col = factor(p < 0.05)), size = 3) +
+  geom_linerange(aes(x = year, ymin = lower95, ymax = upper95, col = factor(p < 0.05)), size = 1.5) + 
+  geom_point(aes(x = year, y = subset_est), col = "orange", size = 3) +
+  geom_hline(aes(yintercept = 0), alpha = 0.5, size = 1) + 
+  facet_wrap(~variable, scales = "free") +
+  scale_color_manual(values = c("grey50", "black"))
+
+#coef_subset_vis %>% 
+#  mutate(dontmatch = ifelse(estimate * subset_est > 0, 0, 1)) %>% 
+#  View
+
+## ------------------------------------------------------------------------------------------------ ##
+
+# Incumbent plots
+
+# Incumbents
+incumbent <- function(fp) {
+  df <- fp %>% filter(HistoricElected == "Y", PartyAb == "LNP") %>% select(DivisionNm, HistoricElected)
+  return(df)
+}
+
+# 2007-2016
+
+incum_resids <- data.frame(
+  Residuals = c(glsmod16$actual_residuals, glsmod13$actual_residuals, glsmod10$actual_residuals, glsmod07$actual_residuals), 
+  bind_rows(
+    glsmod16$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp16), by = "DivisionNm"),
+    glsmod13$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp13), by = "DivisionNm"),
+    glsmod10$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp10), by = "DivisionNm"),
+    glsmod07$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp07), by = "DivisionNm")
+  )
+) %>% mutate(Incumbent = ifelse(is.na(HistoricElected), "N", "Y"))
+
+ggplot(aes(x = year, y = Residuals, col = Incumbent), data = incum_resids) + geom_boxplot()
 
 
 
