@@ -52,6 +52,8 @@ my_df <- bind_rows(
     Band_55plus = Age55_64 + Age65_74 + Age75_84 + Age85plus) %>% 
   select(-c(starts_with("Age"), MedianAge)) 
 
+
+
 ## ------------------------------------------------------------------------------------------------ ##
 
 pca_16 <- prcomp(my_df %>% filter(year == "2016") %>% dplyr::select(-c(LNP_Percent, year, DivisionNm, starts_with("Band"))))
@@ -112,15 +114,14 @@ grid.arrange(plot_pc_all1, plot_pc_all2, plot_pc_all3, plot_pc_all4, nrow = 2)
 # Create final df for modelling
 
 factors_df <- my_df %>% 
-  mutate(Education = BachelorAbv + HighSchool + Professional + Finance,
-    LaborerTrades = Laborer + Tradesperson,
+  mutate(Education = BachelorAbv + HighSchool + Professional + Finance - Laborer - Tradesperson - DipCert,
     FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House -
       SP_House,
     PropertyOwned = Owned + Mortgage - Renting - PublicHousing,
     RentLoanPrice = MedianRent + MedianLoanPay,
     Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome,
     Unemployment = Unemployed - LFParticipation) %>% 
-  dplyr::select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, FamilyRatio,
+  dplyr::select(-c(BachelorAbv, HighSchool, Professional, Finance, Laborer, Tradesperson, DipCert, FamilyRatio,
     AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Mortgage, Renting,
     PublicHousing, MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, 
     MedianLoanPay, Unemployed, LFParticipation)) 
@@ -257,7 +258,6 @@ p6 <- grid_visreg("Unemployment")
 p7 <- grid_visreg("MedianAge", top = TRUE)
 p8 <- grid_visreg("Judaism")
 p9 <- grid_visreg("OtherLanguage")
-temp <- grid_visreg("OtherLanguage")
 p10 <- grid_visreg("BornAsia")
 p11 <- grid_visreg("Education")
 p12 <- grid_visreg("BornSEEuro")
@@ -378,9 +378,6 @@ coef_subset_vis %>%
   facet_wrap(~variable, scales = "free") +
   scale_color_manual(values = c("grey50", "black"))
 
-#coef_subset_vis %>% 
-#  mutate(dontmatch = ifelse(estimate * subset_est > 0, 0, 1)) %>% 
-#  View
 
 ## ------------------------------------------------------------------------------------------------ ##
 
@@ -395,94 +392,27 @@ incumbent <- function(fp) {
 # 2007-2016
 
 incum_resids <- data.frame(
-  Residuals = c(glsmod16$actual_residuals, glsmod13$actual_residuals, glsmod10$actual_residuals, glsmod07$actual_residuals), 
+  Residuals = c(glsmod16$actual_residuals, glsmod13$actual_residuals, glsmod10$actual_residuals, glsmod07$actual_residuals, glsmod04$actual_residuals), 
   bind_rows(
     glsmod16$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp16), by = "DivisionNm"),
     glsmod13$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp13), by = "DivisionNm"),
     glsmod10$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp10), by = "DivisionNm"),
-    glsmod07$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp07), by = "DivisionNm")
-  )
-) %>% mutate(Incumbent = ifelse(is.na(HistoricElected), "N", "Y"))
+    glsmod07$my_data %>% select(DivisionNm, year) %>% left_join(incumbent(fp07), by = "DivisionNm"),
+    glsmod04$my_data %>% select(DivisionNm, year) %>% left_join(
+      fp04 %>% filter(PartyAb == "LNP") %>% 
+        left_join(
+          fp01 %>% rename(HistoricElected = Elected) %>% select(UniqueID, HistoricElected, PartyAb), 
+          by = c("UniqueID", "PartyAb")
+        ) %>% incumbent() %>% unique(), by = "DivisionNm")) %>%
+    mutate(Incumbent = ifelse(is.na(HistoricElected), "N", "Y")))
 
 ggplot(aes(x = year, y = Residuals, col = Incumbent), data = incum_resids) + geom_boxplot()
 
+# 2004 
 
-
-
-## ------------------------------------------------------------------------------------------------ ##
-
-
-# Group variables that are very highly correlated and probably describe the same information
-
-# Incomes
-cor(my_df %>% select(contains("Income")))
-
-# Job type
-cor(my_df %>% select(c(Professional, Finance)))
-cor(my_df %>% select(c(DipCert, Laborer, Tradesperson)))
-cor(my_df %>% select(c(Distributive, Transformative)))
-  
-# Education
-cor(my_df %>% select(c(BachelorAbv, HighSchool, DipCert, Professional)))
-
-# Property ownership
-cor(my_df %>% select(c(Owned, Renting)))
-
-# Loan price
-cor(my_df %>% select(c(MedianRent, MedianLoanPay)))
-
-
-# Unemployment
-cor(my_df %>% select(c(Unemployed, LFParticipation)))
-
-# Family and house size
-cor(my_df %>% select(c(FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House)))
-
-# Age brackets
-# 0-19, 20-44, 45-above are the three logical brackets because of correlations
-cor(my_df %>% select(starts_with("Age"))) %>% View
-
-# Removing other variables (if needed)
-# Mortgage, 
-  
-my_df2 <- my_df %>% 
-mutate(Education = BachelorAbv + HighSchool + Professional - DipCert,
-  LaborerTrades = Laborer + Tradesperson,
-  DistributeTransform = Distributive + Transformative,
-  FamHouseSize = FamilyRatio + AverageHouseholdSize + Couple_WChild_House - Couple_NoChild_House -
-    SP_House,
-  PropertyOwned = Owned - Renting,
-  RentLoanPrice = MedianRent + MedianLoanPay,
-  Incomes = MedianFamilyIncome + MedianHouseholdIncome + MedianPersonalIncome,
-  Unemployment = Unemployed - LFParticipation,
-  Band_00_19 = Age00_04 + Age05_14 + Age15_19,
-    Band_20_34 = Age20_24 + Age25_34,
-    Band_35_54 = Age35_44 + Age45_54,
-    Band_55plus = Age55_64 + Age65_74 + Age75_84 + Age85plus) %>% 
-  select(-c(starts_with("Age"), MedianAge, Band_55plus, BachelorAbv, HighSchool, Laborer, Tradesperson, DipCert,
-    FamilyRatio, AverageHouseholdSize, Couple_WChild_House, Couple_NoChild_House, SP_House, Owned, Renting, 
-    MedianFamilyIncome, MedianHouseholdIncome, MedianPersonalIncome, MedianRent, MedianLoanPay, Unemployed, 
-    LFParticipation, Professional)) %>% 
-  select(-c(BornElsewhere, PublicHousing, Mortgage, OtherLanguageHome, Distributive, Transformative))
-
-# Now standardize factors
-
-small_df2 <- bind_rows(
-  my_df2 %>% filter(year == "2001") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2004") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2007") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2010") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2013") %>% standardise_vars(),
-  my_df2 %>% filter(year == "2016") %>% standardise_vars()
-)
-
-# Order electorates in alphabetical order to match spatial matrix
-
-model_df2 <- small_df2 %>% 
-  arrange(year, DivisionNm) %>% 
-  dplyr::select(order(colnames(.)))
-
-save(model_df2, file = "data/model_df2.rda")
-
-# Check for outliers
-#abs2016 %>% select(contains("Media")) %>% gather("key", "value") %>% ggplot(aes(x = key, y = log(value))) + geom_jitter()
+fp04 %>% filter(PartyAb == "LNP") %>% 
+  left_join(
+  fp01 %>% rename(HistoricElected = Elected) %>% select(UniqueID, HistoricElected, PartyAb), 
+    by = c("UniqueID", "PartyAb")
+    ) %>% 
+  incumbent()
