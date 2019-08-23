@@ -381,6 +381,133 @@ coef_subset_vis %>%
 
 ## ------------------------------------------------------------------------------------------------ ##
 
+# Removing highest pairwise correlations and seeing if conclusions change
+paircors <- matrix(model_df2 %>% 
+  select(-c(LNP_Percent, year, DivisionNm)) %>%
+  cor(), ncol = 32) %>% 
+  data.frame()
+colnames(paircors) <- model_df2 %>% 
+  select(-c(LNP_Percent, year, DivisionNm)) %>% names
+paircors$var <- model_df2 %>% 
+  select(-c(LNP_Percent, year, DivisionNm)) %>% names
+
+paircors_sig <- paircors %>% 
+  gather("var2", "cor", -var) %>% 
+  filter(var != var2) %>% 
+  arrange(-cor)  %>% 
+#  filter(var %in% sig_vars, var2 %in% sig_vars) %>% 
+ # filter(abs(cor) > 0.5) %>% 
+  top_n(n = 20, wt = abs(cor))
+
+paircors_clean <- paircors_sig[seq(0, nrow(paircors_sig), 2),] %>% 
+  arrange(var)
+
+paircors_clean
+
+## Function to see how coefficient changes
+sig_cor_plot <- function(var1, var2) {
+  # 2016
+  glsmod16_subset_rm <- my_fgls(full_formula, 
+    my_data = model_df2 %>% filter(year == "2016") %>% select(-var2),
+    sp_weights = sp_weights_16)
+  
+  # 2013
+  glsmod13_subset_rm <- my_fgls(full_formula, 
+    my_data = model_df2 %>% filter(year == "2013") %>% select(-var2),
+    sp_weights = sp_weights_13)
+  
+  # 2010
+  glsmod10_subset_rm <- my_fgls(full_formula, 
+    my_data = model_df2 %>% filter(year == "2010") %>% select(-var2),
+    sp_weights = sp_weights_10)
+  
+  # 2007
+  glsmod07_subset_rm <- my_fgls(full_formula, 
+    my_data = model_df2 %>% filter(year == "2007") %>% select(-var2),
+    sp_weights = sp_weights_07)
+  
+  # 2004
+  glsmod04_subset_rm <- my_fgls(full_formula, 
+    my_data = model_df2 %>% filter(year == "2004") %>% select(-var2),
+    sp_weights = sp_weights_04)
+  
+  # 2001
+  glsmod01_subset_rm <- my_fgls(full_formula, 
+    my_data = model_df2 %>% filter(year == "2001") %>% select(-var2),
+    sp_weights = sp_weights_01)
+  
+  # Coef from removed models
+  coef_subset_rm_df <- bind_rows(
+    data.frame(variable = glsmod16_subset_rm$coefficients %>% names, estimate = glsmod16_subset_rm$coefficients %>% unname, se = summary(glsmod16_subset_rm)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod16_subset_rm)$tTable[, "p-value"] %>% unname, year = 2016),
+    data.frame(variable = glsmod13_subset_rm$coefficients %>% names, estimate = glsmod13_subset_rm$coefficients %>% unname, se = summary(glsmod13_subset_rm)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod13_subset_rm)$tTable[, "p-value"] %>% unname, year = 2013),
+    data.frame(variable = glsmod10_subset_rm$coefficients %>% names, estimate = glsmod10_subset_rm$coefficients %>% unname, se = summary(glsmod10_subset_rm)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod10_subset_rm)$tTable[, "p-value"] %>% unname, year = 2010),
+    data.frame(variable = glsmod07_subset_rm$coefficients %>% names, estimate = glsmod07_subset_rm$coefficients %>% unname, se = summary(glsmod07_subset_rm)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod07_subset_rm)$tTable[, "p-value"] %>% unname, year = 2007),
+    data.frame(variable = glsmod04_subset_rm$coefficients %>% names, estimate = glsmod04_subset_rm$coefficients %>% unname, se = summary(glsmod04_subset_rm)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod04_subset_rm)$tTable[, "p-value"] %>% unname, year = 2004),
+    data.frame(variable = glsmod01_subset_rm$coefficients %>% names, estimate = glsmod01_subset_rm$coefficients %>% unname, se = summary(glsmod01_subset_rm)$tTable[, "Std.Error"] %>% unname, p = summary(glsmod01_subset_rm)$tTable[, "p-value"] %>% unname, year = 2001)
+  )
+  
+  # DF
+  mydf = coef_df %>% 
+    filter(variable == var1) %>% 
+    mutate(rm_estimate = coef_subset_rm_df %>% filter(variable == var1) %>% select(estimate) %>% unlist,
+      rm_se = coef_subset_rm_df %>% filter(variable == var1) %>% select(se) %>% unlist)
+  
+  # plot
+  myplot <- mydf %>% 
+    ggplot(aes(x = year)) +
+    geom_point(aes(y = estimate), col = "blue") + 
+    geom_point(aes(y = rm_estimate), col = "red") +
+    geom_linerange(aes(ymin = rm_estimate - 1.96*rm_se, ymax = rm_estimate + 1.96*rm_se), col = "red", size = 0.5, alpha = 0.5) +
+    geom_linerange(aes(ymin = estimate - 1.96*se, ymax = estimate + 1.96*se), col = "blue", size = 1, alpha = 0.5) +
+    lims(y = c(-25,25))
+  
+  print(paste("Blue is effect for ", var1, " in full model with ", var2))
+  print(paste("Red is effect for ", var1, " in model without ", var2))
+  
+  return(myplot)
+}
+
+# A quick analysis of the top 5 pairwise correlations amongst significant variables
+# All of the 95% confidence intervals overlap
+# No variable changes from significant in one direction to the other
+sig_cor_plot("Band_20_34", "Married")
+sig_cor_plot("Married", "Band_20_34")
+sig_cor_plot("Born_SE_Europe", "OtherLanguageHome")
+sig_cor_plot("OtherLanguageHome", "Born_SE_Europe")
+sig_cor_plot("DiffAddress", "DeFacto")
+sig_cor_plot("DeFacto", "DiffAddress")
+sig_cor_plot("Education", "Incomes")
+sig_cor_plot("Incomes", "Education")
+sig_cor_plot("Incomes", "Unemployment")
+sig_cor_plot("Unemployment", "Incomes")
+
+
+# A quick analysis of the top 10 pairwise correlations amongst all variables
+# All of the 95% confidence intervals overlap
+# No variable changes from significant in one direction to the other
+sig_cor_plot("AusCitizen", "Band_20_34")
+sig_cor_plot("Band_20_34", "AusCitizen")
+sig_cor_plot("AusCitizen", "OtherLanguageHome")
+sig_cor_plot("OtherLanguageHome", "AusCitizen")
+sig_cor_plot("BornElsewhere", "Born_Asia")
+sig_cor_plot("Born_Asia", "BornElsewhere")
+sig_cor_plot("Born_Asia", "OtherLanguageHome")
+sig_cor_plot("OtherLanguageHome", "Born_Asia")
+sig_cor_plot("Born_Asia", "Buddhism")
+sig_cor_plot("Buddhism", "Born_Asia")
+sig_cor_plot("BornElsewhere", "Buddhism")
+sig_cor_plot("Buddhism", "BornElsewhere")
+sig_cor_plot("BornElsewhere", "OtherLanguageHome")
+sig_cor_plot("OtherLanguageHome", "BornElsewhere")
+sig_cor_plot("DiffAddress", "OtherLanguageHome")
+sig_cor_plot("OtherLanguageHome", "DiffAddress")
+sig_cor_plot("RentLoanPrice", "Incomes")
+sig_cor_plot("Incomes", "RentLoanPrice")
+sig_cor_plot("Islam", "OtherLanguageHome")
+sig_cor_plot("OtherLanguageHome", "Islam")
+
+## ------------------------------------------------------------------------------------------------ ##
+
 # Incumbent plots
 
 # Incumbents
